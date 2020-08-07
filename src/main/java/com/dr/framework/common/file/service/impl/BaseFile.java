@@ -1,4 +1,4 @@
-package com.dr.framework.common.file;
+package com.dr.framework.common.file.service.impl;
 
 import com.dr.framework.common.entity.BaseCreateInfoEntity;
 import com.dr.framework.core.orm.annotations.Column;

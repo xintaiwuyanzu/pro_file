@@ -1,4 +1,4 @@
-package com.dr.framework.common.file;
+package com.dr.framework.common.file.service.impl;
 
 import com.dr.framework.core.orm.annotations.Column;
 import com.dr.framework.core.orm.annotations.Table;
@@ -9,9 +9,9 @@ import com.dr.framework.util.Constants;
  *
  * @author dr
  */
-@Table(name = Constants.COMMON_TABLE_PREFIX + "FILE_INFO", genInfo = false, module = Constants.COMMON_MODULE_NAME)
+@Table(name = Constants.COMMON_TABLE_PREFIX + "FILE_INFO", module = Constants.COMMON_MODULE_NAME)
 class FileBaseInfo extends BaseFile {
-    @Column(comment = "文件大小", length = 10)
+    @Column(name = "fileSize", comment = "文件大小", length = 10)
     private long size;
     /**
      * 相同hash文件不重复存储

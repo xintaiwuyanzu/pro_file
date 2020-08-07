@@ -1,4 +1,4 @@
-package com.dr.framework.common.file;
+package com.dr.framework.common.file.service.impl;
 
 import com.dr.framework.common.entity.BaseCreateInfoEntity;
 import com.dr.framework.core.orm.annotations.Column;
@@ -14,7 +14,7 @@ import com.dr.framework.util.Constants;
  *
  * @author dr
  */
-@Table(name = Constants.COMMON_TABLE_PREFIX + "FILE_META", comment = "文件元数据", module = Constants.COMMON_MODULE_NAME, genInfo = false)
+@Table(name = Constants.COMMON_TABLE_PREFIX + "FILE_META", comment = "文件元数据", module = Constants.COMMON_MODULE_NAME)
 class FileMetaData extends BaseCreateInfoEntity {
 
     @Column(comment = "业务外键", length = 100)
@@ -25,9 +25,9 @@ class FileMetaData extends BaseCreateInfoEntity {
      */
     @Column(comment = "业务外键类型", length = 4)
     private Integer refType;
-    @Column(comment = "业务外键key", length = 50)
+    @Column(name = "metaKey", comment = "业务外键key", length = 50)
     private String key;
-    @Column(comment = "业务外键value", type = ColumnType.CLOB)
+    @Column(name = "metaValue", comment = "业务外键value", type = ColumnType.CLOB)
     private String value;
 
     public String getRefId() {

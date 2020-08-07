@@ -1,14 +1,6 @@
 package com.dr.framework.common.file.model;
 
-import java.io.IOException;
-import java.io.InputStream;
-
-/**
- * 简单的附件基本信息对象，需要拓展各种类型的附件信息
- *
- * @author dr
- */
-public interface SimpleFile {
+public interface BaseFile {
     /**
      * 获取文件名称
      *
@@ -52,11 +44,9 @@ public interface SimpleFile {
     String getFileHash();
 
     /**
-     * 获取文件流
+     * 获取文件描述
      *
      * @return
-     * @throws IOException
      */
-    InputStream getInputStream() throws IOException;
-
+    String getDescription();
 }

@@ -1,4 +1,4 @@
-package com.dr.framework.common.file;
+package com.dr.framework.common.file.service.impl;
 
 import com.dr.framework.common.entity.BaseCreateInfoEntity;
 import com.dr.framework.core.orm.annotations.Column;
@@ -12,7 +12,7 @@ import com.dr.framework.util.Constants;
  *
  * @author dr
  */
-@Table(name = Constants.COMMON_TABLE_PREFIX + "FILE_RELATION", genInfo = false, module = Constants.COMMON_MODULE_NAME)
+@Table(name = Constants.COMMON_TABLE_PREFIX + "FILE_RELATION", module = Constants.COMMON_MODULE_NAME)
 class FileRelation extends BaseCreateInfoEntity {
 
     @Column(comment = "文件描述", length = 1000)
