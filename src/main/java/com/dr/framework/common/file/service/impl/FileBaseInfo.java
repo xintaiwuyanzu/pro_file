@@ -1,6 +1,8 @@
 package com.dr.framework.common.file.service.impl;
 
+import com.dr.framework.common.entity.BaseCreateInfoEntity;
 import com.dr.framework.core.orm.annotations.Column;
+import com.dr.framework.core.orm.annotations.ColumnType;
 import com.dr.framework.core.orm.annotations.Table;
 import com.dr.framework.util.Constants;
 
@@ -10,7 +12,16 @@ import com.dr.framework.util.Constants;
  * @author dr
  */
 @Table(name = Constants.COMMON_TABLE_PREFIX + "FILE_INFO", module = Constants.COMMON_MODULE_NAME)
-class FileBaseInfo extends BaseFile {
+class FileBaseInfo extends BaseCreateInfoEntity {
+    @Column(comment = "文件原始名称", length = 500)
+    private String originName;
+    @Column(comment = "文件原始后缀", length = 100)
+    private String suffix;
+    @Column(comment = "原始文件创建日期", type = ColumnType.DATE)
+    private long originCreateDate;
+    @Column(comment = "原始文件最后更新日期", type = ColumnType.DATE)
+    private long lastModifyDate;
+
     @Column(name = "fileSize", comment = "文件大小", length = 10)
     private long size;
     /**
@@ -20,7 +31,39 @@ class FileBaseInfo extends BaseFile {
     private String hash;
 
     @Column(comment = "文件实际类型", length = 100)
-    private String mineType;
+    private String mimeType;
+
+    public String getOriginName() {
+        return originName;
+    }
+
+    public void setOriginName(String originName) {
+        this.originName = originName;
+    }
+
+    public String getSuffix() {
+        return suffix;
+    }
+
+    public void setSuffix(String suffix) {
+        this.suffix = suffix;
+    }
+
+    public long getOriginCreateDate() {
+        return originCreateDate;
+    }
+
+    public void setOriginCreateDate(long originCreateDate) {
+        this.originCreateDate = originCreateDate;
+    }
+
+    public long getLastModifyDate() {
+        return lastModifyDate;
+    }
+
+    public void setLastModifyDate(long lastModifyDate) {
+        this.lastModifyDate = lastModifyDate;
+    }
 
     public long getSize() {
         return size;
@@ -38,11 +81,11 @@ class FileBaseInfo extends BaseFile {
         this.hash = hash;
     }
 
-    public String getMineType() {
-        return mineType;
+    public String getMimeType() {
+        return mimeType;
     }
 
-    public void setMineType(String mineType) {
-        this.mineType = mineType;
+    public void setMimeType(String mimeType) {
+        this.mimeType = mimeType;
     }
 }

@@ -12,28 +12,6 @@ public interface FileInfo extends BaseFile {
     String getId();
 
     /**
-     * 获取上一个Id
-     *
-     * @return
-     */
-    String getPreId();
-
-    /**
-     * 获取下一个Id
-     *
-     * @return
-     */
-    String getNextId();
-
-
-    /**
-     * 获取文件基本信息Id
-     *
-     * @return
-     */
-    String getBaseFileId();
-
-    /**
      * 文件业务外键
      *
      * @return
@@ -55,24 +33,9 @@ public interface FileInfo extends BaseFile {
     String getGroupCode();
 
     /**
-     * 文件保存时间
-     *
-     * @return
-     */
-    long getSaveDate();
-
-    /**
-     * 获取文件mine
-     *
-     * @return
-     */
-    String getMine();
-
-    /**
      * 获取文件描述
      *
      * @return
      */
     String getDescription();
-
 }

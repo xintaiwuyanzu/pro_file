@@ -1,6 +1,14 @@
 package com.dr.framework.common.file.model;
 
 public interface BaseFile {
+
+    /**
+     * 获取文件基本信息Id
+     *
+     * @return
+     */
+    String getBaseFileId();
+
     /**
      * 获取文件名称
      *
@@ -14,6 +22,13 @@ public interface BaseFile {
      * @return
      */
     String getSuffix();
+
+    /**
+     * 获取文件mine
+     *
+     * @return
+     */
+    String getMimeType();
 
     /**
      * 获取文件创建日期
@@ -30,6 +45,13 @@ public interface BaseFile {
     long getLastModifyDate();
 
     /**
+     * 文件保存时间
+     *
+     * @return
+     */
+    long getSaveDate();
+
+    /**
      * 获取文件大小
      *
      * @return
@@ -43,10 +65,4 @@ public interface BaseFile {
      */
     String getFileHash();
 
-    /**
-     * 获取文件描述
-     *
-     * @return
-     */
-    String getDescription();
 }

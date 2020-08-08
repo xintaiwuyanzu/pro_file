@@ -27,4 +27,11 @@ public interface FileResource extends BaseFile {
      * @throws IOException
      */
     InputStream getInputStream() throws IOException;
+
+    /**
+     * 获取文件描述
+     *
+     * @return
+     */
+    String getDescription();
 }

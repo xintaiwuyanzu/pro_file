@@ -1,6 +1,6 @@
 package com.dr.framework.common.file.service;
 
-import com.dr.framework.common.file.model.FileInfo;
+import com.dr.framework.common.file.model.BaseFile;
 import com.dr.framework.common.file.model.FileResource;
 import org.springframework.core.Ordered;
 
@@ -21,7 +21,7 @@ public interface FileHandler extends Ordered {
      * @param fileInfo
      * @return
      */
-    default boolean canHandle(FileInfo fileInfo) {
+    default boolean canHandle(BaseFile fileInfo) {
         return false;
     }
 
@@ -32,7 +32,7 @@ public interface FileHandler extends Ordered {
      * @param fileInfo
      * @throws IOException
      */
-    void writeFile(FileResource file, FileInfo fileInfo) throws IOException;
+    void writeFile(FileResource file, BaseFile fileInfo) throws IOException;
 
     /**
      * 读文件
@@ -41,14 +41,14 @@ public interface FileHandler extends Ordered {
      * @return
      * @throws IOException
      */
-    InputStream readFile(FileInfo fileInfo) throws IOException;
+    InputStream readFile(BaseFile fileInfo) throws IOException;
 
     /**
      * 删除文件
      *
      * @param fileInfo
      */
-    void deleteFile(FileInfo fileInfo);
+    void deleteFile(BaseFile fileInfo);
 
     @Override
     default int getOrder() {

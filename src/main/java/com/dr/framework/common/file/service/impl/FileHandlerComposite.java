@@ -1,6 +1,6 @@
 package com.dr.framework.common.file.service.impl;
 
-import com.dr.framework.common.file.model.FileInfo;
+import com.dr.framework.common.file.model.BaseFile;
 import com.dr.framework.common.file.model.FileResource;
 import com.dr.framework.common.file.service.FileHandler;
 import org.springframework.util.Assert;
@@ -27,12 +27,12 @@ public class FileHandlerComposite implements FileHandler {
     }
 
     @Override
-    public boolean canHandle(FileInfo fileInfo) {
+    public boolean canHandle(BaseFile fileInfo) {
         return true;
     }
 
     @Override
-    public void writeFile(FileResource file, FileInfo fileInfo) throws IOException {
+    public void writeFile(FileResource file, BaseFile fileInfo) throws IOException {
         for (FileHandler handler : fileHandlers) {
             if (handler.canHandle(fileInfo)) {
                 handler.writeFile(file, fileInfo);
@@ -42,7 +42,7 @@ public class FileHandlerComposite implements FileHandler {
     }
 
     @Override
-    public InputStream readFile(FileInfo fileInfo) throws IOException {
+    public InputStream readFile(BaseFile fileInfo) throws IOException {
         for (FileHandler handler : fileHandlers) {
             if (handler.canHandle(fileInfo)) {
                 return handler.readFile(fileInfo);
@@ -52,7 +52,7 @@ public class FileHandlerComposite implements FileHandler {
     }
 
     @Override
-    public void deleteFile(FileInfo fileInfo) {
+    public void deleteFile(BaseFile fileInfo) {
         for (FileHandler handler : fileHandlers) {
             if (handler.canHandle(fileInfo)) {
                 handler.deleteFile(fileInfo);

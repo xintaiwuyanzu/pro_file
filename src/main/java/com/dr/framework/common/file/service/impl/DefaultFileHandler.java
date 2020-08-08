@@ -1,7 +1,7 @@
 package com.dr.framework.common.file.service.impl;
 
 import com.dr.framework.common.file.autoconfig.CommonFileConfig;
-import com.dr.framework.common.file.model.FileInfo;
+import com.dr.framework.common.file.model.BaseFile;
 import com.dr.framework.common.file.model.FileResource;
 import com.dr.framework.common.file.service.FileHandler;
 import org.apache.commons.lang3.time.DateFormatUtils;
@@ -28,11 +28,11 @@ public class DefaultFileHandler implements FileHandler, InitializingBean {
     protected ApplicationHome applicationHome;
 
     @Override
-    public boolean canHandle(FileInfo fileInfo) {
+    public boolean canHandle(BaseFile fileInfo) {
         return true;
     }
 
-    protected String buildFilePath(FileInfo fileInfo) {
+    protected String buildFilePath(BaseFile fileInfo) {
         Date date = new Date(fileInfo.getSaveDate());
         return String.join(
                 File.separator,
@@ -57,7 +57,7 @@ public class DefaultFileHandler implements FileHandler, InitializingBean {
     }
 
     @Override
-    public void writeFile(FileResource file, FileInfo fileInfo) throws IOException {
+    public void writeFile(FileResource file, BaseFile fileInfo) throws IOException {
         String path = buildFilePath(fileInfo);
         File sysFile = new File(path);
         if (!sysFile.getParentFile().exists()) {
@@ -67,7 +67,7 @@ public class DefaultFileHandler implements FileHandler, InitializingBean {
     }
 
     @Override
-    public InputStream readFile(FileInfo fileInfo) throws IOException {
+    public InputStream readFile(BaseFile fileInfo) throws IOException {
         String path = buildFilePath(fileInfo);
         File sysFile = new File(path);
         if (!sysFile.exists()) {
@@ -77,7 +77,7 @@ public class DefaultFileHandler implements FileHandler, InitializingBean {
     }
 
     @Override
-    public void deleteFile(FileInfo fileInfo) {
+    public void deleteFile(BaseFile fileInfo) {
         String path = buildFilePath(fileInfo);
         File sysFile = new File(path);
         if (sysFile.exists()) {

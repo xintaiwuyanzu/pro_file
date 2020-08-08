@@ -14,14 +14,14 @@ import com.dr.framework.util.Constants;
  */
 @Table(name = Constants.COMMON_TABLE_PREFIX + "FILE_RELATION", module = Constants.COMMON_MODULE_NAME)
 class FileRelation extends BaseCreateInfoEntity {
-
-    @Column(comment = "文件描述", length = 1000)
-    private String description;
     /**
      * 关联文件ID
      */
     @Column(length = 100)
     private String fileId;
+
+    @Column(comment = "文件描述", length = 1000)
+    private String description;
     /*
      * =========================
      * 文件关联信息
@@ -44,19 +44,28 @@ class FileRelation extends BaseCreateInfoEntity {
     private String groupCode;
     /*
      * =========================
-     * 双向链表构建文件排序
+     * 单链表构建文件排序
      * =========================
      */
-    /**
-     * 第一个附件的上一个附件Id为null
-     */
-    @Column(comment = "前一个附件Id", length = 100)
-    private String preId;
     /**
      * 最后一个附件的下一个Id为null
      */
     @Column(comment = "后一个附件Id", length = 100)
+    private String preId;
+
+    @Column(comment = "后一个附件Id", length = 100)
     private String nextId;
+
+
+    public FileRelation() {
+    }
+
+    public FileRelation(String refId, String refType, String groupCode) {
+        this.refId = refId;
+        this.refType = refType;
+        this.groupCode = groupCode;
+    }
+
 
     public String getDescription() {
         return description;
@@ -98,19 +107,19 @@ class FileRelation extends BaseCreateInfoEntity {
         this.groupCode = groupCode;
     }
 
-    public String getPreId() {
-        return preId;
-    }
-
-    public void setPreId(String preId) {
-        this.preId = preId;
-    }
-
     public String getNextId() {
         return nextId;
     }
 
     public void setNextId(String nextId) {
         this.nextId = nextId;
+    }
+
+    public String getPreId() {
+        return preId;
+    }
+
+    public void setPreId(String preId) {
+        this.preId = preId;
     }
 }
