@@ -1,0 +1,1 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=com.dr.framework.common.file.autoconfig.CommonFileAutoConfig

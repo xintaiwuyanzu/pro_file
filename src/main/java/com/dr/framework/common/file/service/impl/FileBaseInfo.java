@@ -22,13 +22,13 @@ class FileBaseInfo extends BaseCreateInfoEntity {
     @Column(comment = "原始文件最后更新日期", type = ColumnType.DATE)
     private long lastModifyDate;
 
-    @Column(name = "fileSize", comment = "文件大小", length = 10)
-    private long size;
+    @Column(comment = "文件大小", length = 10)
+    private long fileSize;
     /**
      * 相同hash文件不重复存储
      */
-    @Column(name = "fileHash", comment = "文件hash", length = 100)
-    private String hash;
+    @Column(comment = "文件hash", length = 200)
+    private String fileHash;
 
     @Column(comment = "文件实际类型", length = 100)
     private String mimeType;
@@ -65,20 +65,20 @@ class FileBaseInfo extends BaseCreateInfoEntity {
         this.lastModifyDate = lastModifyDate;
     }
 
-    public long getSize() {
-        return size;
+    public long getFileSize() {
+        return fileSize;
     }
 
-    public void setSize(long size) {
-        this.size = size;
+    public void setFileSize(long fileSize) {
+        this.fileSize = fileSize;
     }
 
-    public String getHash() {
-        return hash;
+    public String getFileHash() {
+        return fileHash;
     }
 
-    public void setHash(String hash) {
-        this.hash = hash;
+    public void setFileHash(String fileHash) {
+        this.fileHash = fileHash;
     }
 
     public String getMimeType() {

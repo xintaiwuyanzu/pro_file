@@ -1,7 +1,7 @@
 package com.dr.framework.common.file.service.impl;
 
-import com.dr.framework.common.file.model.FileResource;
-import com.dr.framework.common.file.service.FileMineHandler;
+import com.dr.framework.common.file.FileResource;
+import com.dr.framework.common.file.FileMineHandler;
 import org.apache.tika.Tika;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

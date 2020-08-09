@@ -1,7 +1,7 @@
 package com.dr.framework.common.file.autoconfig;
 
 import com.dr.framework.common.file.service.CommonFileService;
-import com.dr.framework.common.file.service.FileMineHandler;
+import com.dr.framework.common.file.FileMineHandler;
 import com.dr.framework.common.file.service.impl.DefaultCommonFileService;
 import com.dr.framework.common.file.service.impl.DefaultTikaFileMineHandler;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;

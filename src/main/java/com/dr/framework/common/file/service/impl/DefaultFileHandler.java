@@ -1,9 +1,9 @@
 package com.dr.framework.common.file.service.impl;
 
+import com.dr.framework.common.file.BaseFile;
+import com.dr.framework.common.file.FileHandler;
+import com.dr.framework.common.file.FileResource;
 import com.dr.framework.common.file.autoconfig.CommonFileConfig;
-import com.dr.framework.common.file.model.BaseFile;
-import com.dr.framework.common.file.model.FileResource;
-import com.dr.framework.common.file.service.FileHandler;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +24,9 @@ import java.util.Date;
 public class DefaultFileHandler implements FileHandler, InitializingBean {
     @Autowired
     protected CommonFileConfig fileConfig;
-    //默认获取jar包所在位置
+    /**
+     * 默认获取jar包所在位置
+     */
     protected ApplicationHome applicationHome;
 
     @Override
@@ -38,7 +40,7 @@ public class DefaultFileHandler implements FileHandler, InitializingBean {
                 File.separator,
                 getRoot(),
                 //文件类型
-                fileInfo.getSuffix(),
+                StringUtils.isEmpty(fileInfo.getSuffix()) ? "default" : fileInfo.getSuffix(),
                 //年月日
                 DateFormatUtils.format(date, "yyyy"),
                 DateFormatUtils.format(date, "MM"),
@@ -52,7 +54,7 @@ public class DefaultFileHandler implements FileHandler, InitializingBean {
         if (!StringUtils.isEmpty(fileConfig.getFileLocation())) {
             return fileConfig.getFileLocation();
         } else {
-            return applicationHome.getSource().getParent() + File.separator + fileConfig.getRootDirName();
+            return applicationHome.getDir().getPath() + File.separator + fileConfig.getRootDirName();
         }
     }
 

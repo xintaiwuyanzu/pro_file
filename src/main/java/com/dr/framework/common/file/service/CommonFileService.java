@@ -2,7 +2,7 @@ package com.dr.framework.common.file.service;
 
 import com.dr.framework.common.file.model.FileInfo;
 import com.dr.framework.common.file.model.FileMeta;
-import com.dr.framework.common.file.model.FileResource;
+import com.dr.framework.common.file.FileResource;
 
 import java.io.IOException;
 import java.util.List;
@@ -135,14 +135,14 @@ public interface CommonFileService {
      * @param firstFileId
      * @param secondFileId
      */
-    void switchOrder(String firstFileId, String secondFileId);
+    long switchOrder(String firstFileId, String secondFileId);
 
     /**
      * 挪到第一个
      *
      * @param fileId
      */
-    void moveFirst(String fileId);
+    long moveFirst(String fileId);
 
     /**
      * 挪到最后一个
@@ -150,21 +150,21 @@ public interface CommonFileService {
      * @param fileId
      */
 
-    void moveLast(String fileId);
+    long moveLast(String fileId);
 
     /**
      * 向前移动文件
      *
      * @param fileId
      */
-    void moveForward(String fileId);
+    long moveForward(String fileId);
 
     /**
      * 向后移动文件
      *
      * @param fileId
      */
-    void moveBack(String fileId);
+    long moveBack(String fileId);
 
     /*
      * ===================================
@@ -326,6 +326,8 @@ public interface CommonFileService {
     }
 
     /**
+     * 根据业务外键，业务类型，分组删除所有附件
+     *
      * @param refId
      * @param refType
      * @param groupCode

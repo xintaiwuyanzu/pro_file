@@ -1,7 +1,11 @@
 package com.dr.framework.common.file.model;
 
+import com.dr.framework.common.file.BaseFile;
+
 /**
  * 文件基本信息，用来传递和返回参数
+ *
+ * @author dr
  */
 public interface FileInfo extends BaseFile {
     /**

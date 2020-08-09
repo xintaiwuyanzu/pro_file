@@ -1,8 +1,8 @@
 package com.dr.framework.common.file.service.impl;
 
-import com.dr.framework.common.file.model.BaseFile;
-import com.dr.framework.common.file.model.FileResource;
-import com.dr.framework.common.file.service.FileHandler;
+import com.dr.framework.common.file.BaseFile;
+import com.dr.framework.common.file.FileResource;
+import com.dr.framework.common.file.FileHandler;
 import org.springframework.util.Assert;
 
 import java.io.IOException;

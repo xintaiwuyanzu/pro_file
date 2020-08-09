@@ -1,7 +1,5 @@
-package com.dr.framework.common.file.service;
+package com.dr.framework.common.file;
 
-import com.dr.framework.common.file.model.BaseFile;
-import com.dr.framework.common.file.model.FileResource;
 import org.springframework.core.Ordered;
 
 import java.io.IOException;

@@ -2,10 +2,11 @@ package com.dr.framework.common.file.service.impl;
 
 import com.dr.framework.common.file.model.FileInfo;
 import com.dr.framework.common.file.model.FileMeta;
-import com.dr.framework.common.file.model.FileResource;
+import com.dr.framework.common.file.FileResource;
 import com.dr.framework.common.file.service.CommonFileService;
 import com.dr.framework.common.service.CommonService;
 import com.dr.framework.core.orm.sql.support.SqlQuery;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
@@ -20,36 +21,45 @@ import java.util.stream.Collectors;
  * @author dr
  */
 public class DefaultCommonFileService extends AbstractCommonFileService implements CommonFileService {
+    @Autowired
+    CommonFileMapper fileMapper;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public FileInfo addFileFirst(FileResource file, String refId, String refType, String groupCode) throws IOException {
         //如果第一个文件没有的话，说明是第一个文件
         FileRelation firstFile = first(refId, refType, groupCode);
-        if (firstFile == null) {
-            firstFile = new FileRelation(refId, refType, groupCode);
-        }
-        return saveFile(file, null, firstFile);
+        return saveFile(file, refId, refType, groupCode, null, firstFile == null ? null : firstFile.getId());
     }
 
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public FileInfo addFileLast(FileResource file, String refId, String refType, String groupCode) throws IOException {
         FileRelation lastFile = last(refId, refType, groupCode);
-        if (lastFile == null) {
-            lastFile = new FileRelation(refId, refType, groupCode);
-        }
-        return saveFile(file, lastFile, null);
+        return saveFile(file, refId, refType, groupCode, lastFile == null ? null : lastFile.getId(), null);
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public FileInfo addFileBefore(FileResource file, String fileId) throws IOException {
-        return saveFile(file, pre(fileId), file(fileId));
+        FileRelation relation = file(fileId);
+        return saveFile(
+                file,
+                relation.getRefId(), relation.getRefType(), relation.getGroupCode(),
+                relation.getPreId(), relation.getId()
+        );
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public FileInfo addFileAfter(FileResource file, String fileId) throws IOException {
-        return saveFile(file, file(fileId), next(fileId));
+        FileRelation relation = file(fileId);
+        return saveFile(
+                file,
+                relation.getRefId(), relation.getRefType(), relation.getGroupCode(),
+                relation.getId(), relation.getNextId()
+        );
     }
 
     //TODO 可能要自己写事务
@@ -61,13 +71,13 @@ public class DefaultCommonFileService extends AbstractCommonFileService implemen
         //先查询相同hash的文件是否存在
         FileBaseInfo fileBaseInfo = commonMapper.selectOneByQuery(
                 SqlQuery.from(FileBaseInfo.class)
-                        .equal(FileBaseInfoInfo.HASH, hash)
+                        .equal(FileBaseInfoInfo.FILEHASH, hash)
         );
         if (fileBaseInfo == null) {
             fileBaseInfo = new FileBaseInfo();
             CommonService.bindCreateInfo(fileBaseInfo);
-            fileBaseInfo.setHash(hash);
-            fileBaseInfo.setSize(file.getFileSize());
+            fileBaseInfo.setFileHash(hash);
+            fileBaseInfo.setFileSize(file.getFileSize());
             fileBaseInfo.setOriginCreateDate(file.getCreateDate());
             fileBaseInfo.setLastModifyDate(file.getLastModifyDate());
             fileBaseInfo.setSuffix(file.getSuffix());
@@ -84,14 +94,19 @@ public class DefaultCommonFileService extends AbstractCommonFileService implemen
     /**
      * 保存文件
      *
-     * @param file 文件对象
-     * @param pre  前面的文件
-     * @param next 后面的文件
+     * @param file
+     * @param refId
+     * @param refType
+     * @param groupCode
+     * @param preId
+     * @param nextId
      * @return
      * @throws IOException
      */
     @Transactional(rollbackFor = Exception.class)
-    public FileInfo saveFile(FileResource file, FileRelation pre, FileRelation next) throws IOException {
+    public FileInfo saveFile(FileResource file,
+                             String refId, String refType, String groupCode,
+                             String preId, String nextId) throws IOException {
         FileBaseInfo fileBaseInfo = saveBaseFile(file);
         //创建关联表信息
         FileRelation fileRelation = new FileRelation();
@@ -100,45 +115,20 @@ public class DefaultCommonFileService extends AbstractCommonFileService implemen
         //绑定基本信息
         fileRelation.setDescription(file.getDescription());
         fileRelation.setFileId(fileBaseInfo.getId());
-
         //绑定关联信息
-        FileRelation noNullRelation = pre == null ? next : pre;
-        fileRelation.setRefId(noNullRelation.getRefId());
-        fileRelation.setRefType(noNullRelation.getRefType());
-        fileRelation.setGroupCode(noNullRelation.getGroupCode());
+        fileRelation.setRefId(refId);
+        fileRelation.setRefType(refType);
+        fileRelation.setGroupCode(groupCode);
+        //绑定前后关联Id
+        fileRelation.setPreId(preId);
+        fileRelation.setNextId(nextId);
 
-        if (pre != null) {
-            fileRelation.setPreId(pre.getId());
-        }
-        if (next != null) {
-            fileRelation.setNextId(next.getId());
-        }
-        //更新前后的关联信息
-        updateRelation(fileRelation.getId(), pre, true);
-        updateRelation(fileRelation.getId(), next, false);
+        //更新前后id的链表
+        updateRelation(preId, fileRelation.getId(), false);
+        updateRelation(nextId, fileRelation.getId(), false);
         //添加关联表数据
         commonMapper.insert(fileRelation);
         return new DefaultFileInfo(fileBaseInfo, fileRelation);
-    }
-
-    @Transactional(rollbackFor = Exception.class)
-    public long updateRelation(String newId, FileRelation relation, boolean isPre) {
-        if (relation != null && !StringUtils.isEmpty(relation.getId())) {
-            return updateRelation(relation.getId(), newId, !isPre);
-        }
-        return 0;
-    }
-
-    @Transactional(rollbackFor = Exception.class)
-    public long updateRelation(String updateId, String relationId, boolean isPre) {
-        Assert.isTrue(!StringUtils.isEmpty(updateId), "要更新的文件Id不能为空！");
-        return commonMapper.updateByQuery(
-                SqlQuery.from(FileRelation.class, false)
-                        .set(isPre ? FileRelationInfo.NEXTID : FileRelationInfo.PREID, relationId)
-                        .set(FileRelationInfo.UPDATEPERSON, getCurrentPersonId())
-                        .set(FileRelationInfo.UPDATEDATE, System.currentTimeMillis())
-                        .equal(FileRelationInfo.ID, updateId)
-        );
     }
 
     @Override
@@ -192,106 +182,142 @@ public class DefaultCommonFileService extends AbstractCommonFileService implemen
         }
     }
 
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public long switchOrder(String firstFileId, String secondFileId) {
+        if (firstFileId.equals(secondFileId)) {
+            return 0;
+        }
+        FileRelation first = file(firstFileId);
+        FileRelation second = file(secondFileId);
+        long count = 0;
+        if (first.getId().equals(second.getPreId())) {
+            count = changeNeighbour(first, second);
+        } else if (first.getId().equals(second.getNextId())) {
+            count = changeNeighbour(second, first);
+        } else {
+            //不是邻居
+            //TODO 这里还有一个隔一个邻居的情况，暂时不处理
+            count += commonMapper.updateByQuery(
+                    SqlQuery.from(FileRelation.class, false)
+                            .set(FileRelationInfo.PREID, second.getPreId())
+                            .set(FileRelationInfo.NEXTID, second.getNextId())
+                            .set(FileRelationInfo.UPDATEPERSON, getCurrentPersonId())
+                            .set(FileRelationInfo.UPDATEDATE, System.currentTimeMillis())
+                            .equal(FileRelationInfo.ID, first.getId())
+            );
+            count += commonMapper.updateByQuery(
+                    SqlQuery.from(FileRelation.class, false)
+                            .set(FileRelationInfo.PREID, first.getPreId())
+                            .set(FileRelationInfo.NEXTID, first.getNextId())
+                            .set(FileRelationInfo.UPDATEPERSON, getCurrentPersonId())
+                            .set(FileRelationInfo.UPDATEDATE, System.currentTimeMillis())
+                            .equal(FileRelationInfo.ID, second.getId())
+            );
+            count += updateRelation(first.getNextId(), second.getId(), true);
+            count += updateRelation(first.getPreId(), second.getId(), false);
+            count += updateRelation(second.getNextId(), first.getId(), true);
+            count += updateRelation(second.getPreId(), first.getId(), false);
+        }
+        return count;
+    }
 
     /**
-     * 执行切换
+     * 邻居互换
      *
-     * @param first
-     * @param second
+     * @param pre
+     * @param next
+     * @return
      */
-    @Transactional(rollbackFor = Exception.class)
-    public void doMove(FileRelation first, FileRelation second) {
-        if (first.getId().equals(second.getId())) {
-            return;
-        }
-        String personId = getCurrentPersonId();
-        //更新前面的
-        commonMapper.updateIgnoreNullByQuery(
-                SqlQuery.from(FileRelation.class)
-                        .set(FileRelationInfo.NEXTID, second.getNextId())
+    private long changeNeighbour(FileRelation pre, FileRelation next) {
+        long count = updateRelation(pre.getPreId(), next.getId(), false);
+        count += updateRelation(next.getNextId(), pre.getId(), true);
+        count += commonMapper.updateByQuery(
+                SqlQuery.from(FileRelation.class, false)
+                        .set(FileRelationInfo.PREID, next.getId())
+                        .set(FileRelationInfo.NEXTID, next.getNextId())
+                        .set(FileRelationInfo.UPDATEPERSON, getCurrentPersonId())
                         .set(FileRelationInfo.UPDATEDATE, System.currentTimeMillis())
-                        .set(FileRelationInfo.UPDATEPERSON, personId)
-                        .equal(FileRelationInfo.ID, first.getId())
+                        .equal(FileRelationInfo.ID, pre.getId())
         );
-        //更新后面的
-        commonMapper.updateIgnoreNullByQuery(
-                SqlQuery.from(FileRelation.class)
-                        .set(FileRelationInfo.NEXTID, first.getId())
+        count += commonMapper.updateByQuery(
+                SqlQuery.from(FileRelation.class, false)
+                        .set(FileRelationInfo.PREID, pre.getPreId())
+                        .set(FileRelationInfo.NEXTID, pre.getId())
+                        .set(FileRelationInfo.UPDATEPERSON, getCurrentPersonId())
                         .set(FileRelationInfo.UPDATEDATE, System.currentTimeMillis())
-                        .set(FileRelationInfo.UPDATEPERSON, personId)
-                        .equal(FileRelationInfo.ID, second.getId())
+                        .equal(FileRelationInfo.ID, next.getId())
         );
-    }
-
-
-    @Override
-    @Transactional(rollbackFor = Exception.class)
-    public void switchOrder(String firstFileId, String secondFileId) {
-        Assert.isTrue(!StringUtils.isEmpty(firstFileId), "指定的文件Id不能为空");
-        Assert.isTrue(!StringUtils.isEmpty(secondFileId), "指定的文件Id不能为空");
-        if (firstFileId.equals(secondFileId)) {
-            return;
-        }
-        FileRelation first = getFileRelationOnlyId(firstFileId);
-        FileRelation second = getFileRelationOnlyId(secondFileId);
-        if (!StringUtils.isEmpty(first.getNextId())) {
-            if (first.getNextId().equals(second.getId())) {
-                doMove(first, second);
-            } else {
-
-            }
-        }
+        return count;
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void moveFirst(String fileId) {
-        Assert.isTrue(!StringUtils.isEmpty(fileId), "指定的文件Id不能为空！");
-        FileRelation fileRelation = getFileRelationOnlyId(fileId);
-        doMoveFirst(fileRelation);
+    public long moveFirst(String fileId) {
+        FileRelation relation = file(fileId);
+        long count = 0;
+        if (!StringUtils.isEmpty(relation.getPreId())) {
+            //当前文件不是第一个
+            FileRelation first = first(relation.getRefId(), relation.getRefType(), relation.getGroupCode());
+            //设置当前文件pre为null
+            count += updateRelation(relation.getId(), null, true);
+            //设置first的pre为当前id
+            count += updateRelation(first.getId(), relation.getId(), true);
+            //设置next的pre为pre
+            count += updateRelation(relation.getNextId(), relation.getPreId(), true);
+            //设置pre的next为next
+            count += updateRelation(relation.getPreId(), relation.getNextId(), false);
+        }
+        return count;
     }
 
-    private void doMoveFirst(FileRelation fileRelation) {
-        //当前不是第一个才移动
+    @Override
+    public long moveLast(String fileId) {
+        FileRelation relation = file(fileId);
+        long count = 0;
+        if (!StringUtils.isEmpty(relation.getNextId())) {
+            //当前文件不是最后一个
+            FileRelation last = last(relation.getRefId(), relation.getRefType(), relation.getGroupCode());
+            //设置当前文件next为null
+            count += updateRelation(relation.getId(), null, false);
+            //设置last的pre为当前id
+            count += updateRelation(last.getId(), relation.getId(), false);
+            //设置next的pre为pre
+            count += updateRelation(relation.getNextId(), relation.getPreId(), true);
+            //设置pre的next为next
+            count += updateRelation(relation.getPreId(), relation.getNextId(), false);
+        }
+        return count;
+    }
+
+    @Override
+    public long moveForward(String fileId) {
+        FileRelation fileRelation = file(fileId);
+        long count = 0;
         if (!StringUtils.isEmpty(fileRelation.getPreId())) {
-            String currentPerson = getCurrentPersonId();
-            //更新当前
-            commonMapper.updateByQuery(
-                    SqlQuery.from(FileRelation.class)
-                            .equal(FileRelationInfo.ID, fileRelation.getId())
-            );
-            //更新第一个
-            //更新当前前一个
-            //更新当前后一个
+            FileRelation pre = file(fileRelation.getPreId());
+            count = changeNeighbour(pre, fileRelation);
         }
+        return count;
     }
 
     @Override
-    public void moveLast(String fileId) {
-
-    }
-
-    @Override
-    public void moveForward(String fileId) {
-        Assert.isTrue(!StringUtils.isEmpty(fileId), "指定的文件Id不能为空！");
-        FileRelation fileRelation = getFileRelationOnlyId(fileId);
-    }
-
-    @Override
-    public void moveBack(String fileId) {
-        Assert.isTrue(!StringUtils.isEmpty(fileId), "指定的文件Id不能为空！");
-        FileRelation fileRelation = getFileRelationOnlyId(fileId);
+    @Transactional(rollbackFor = Exception.class)
+    public long moveBack(String fileId) {
+        FileRelation fileRelation = file(fileId);
+        long count = 0;
         if (!StringUtils.isEmpty(fileRelation.getNextId())) {
-            FileRelation pre = getFileRelationOnlyId(fileRelation.getNextId());
-            doMove(fileRelation, pre);
+            FileRelation next = file(fileRelation.getNextId());
+            count = changeNeighbour(fileRelation, next);
         }
+        return count;
     }
 
     @Override
     @Transactional(readOnly = true, rollbackFor = Exception.class)
     public List<FileMeta> getFileMeta(String fileId, boolean includeBaseFile) {
         Assert.isTrue(!StringUtils.isEmpty(fileId), "文件Id不能为空！");
-        FileRelation fileRelation = getFileRelationOnlyId(fileId);
+        FileRelation fileRelation = file(fileId);
         SqlQuery<FileMetaData> fileMetaDataSqlQuery = SqlQuery.from(FileMetaData.class);
         if (includeBaseFile) {
             fileMetaDataSqlQuery.in(FileMetaDataInfo.REFID, fileId, fileRelation.getFileId());
@@ -323,7 +349,7 @@ public class DefaultCommonFileService extends AbstractCommonFileService implemen
         Assert.isTrue(!StringUtils.isEmpty(groupCode), "文件分组不能为空！");
         return commonMapper.selectOneByQuery(
                 SqlQuery.from(FileBaseInfo.class, false)
-                        .column(FileBaseInfoInfo.SIZE.sum())
+                        .column(FileBaseInfoInfo.FILESIZE.sum())
                         .in(FileBaseInfoInfo.ID,
                                 SqlQuery.from(FileRelation.class, false)
                                         .column(FileRelationInfo.FILEID)
@@ -355,31 +381,31 @@ public class DefaultCommonFileService extends AbstractCommonFileService implemen
         long count = 0;
         boolean hasNext = !StringUtils.isEmpty(relation.getNextId());
         boolean hasPre = !StringUtils.isEmpty(relation.getPreId());
-
         if (hasNext) {
             //后面的文件
-            FileRelation next = next(fileId);
             if (hasPre) {
                 //前面的文件
-                FileRelation pre = pre(fileId);
-                count += updateRelation(next, );
-                count += updateRelation(next, );
+                count += updateRelation(relation.getPreId(), relation.getNextId(), false);
+                count += updateRelation(relation.getNextId(), relation.getPreId(), true);
             } else {
                 //后面有文件，前面没有文件，说明删除的第一个
-
-
+                count += updateRelation(relation.getNextId(), null, true);
             }
         } else {
             //后面没有，前面有
             if (hasPre) {
                 //前面的文件
-                count += updateRelation(null, pre(fileId), true);
+                count += updateRelation(relation.getPreId(), null, false);
             } else {
-                FileBaseInfo baseInfo = commonMapper.selectById(FileBaseInfo.class, relation.getFileId());
-                Assert.isTrue(baseInfo != null, "未找到实体文件信息");
-                fileHandler.deleteFile(new DefaultBaseFile(baseInfo));
                 //前后都没有，说明只有一个
-                count += commonMapper.deleteById(FileBaseInfo.class, relation.getFileId());
+                //如果相同文件Id的数据只有一个，删除基本文件
+                long sameFileSize = commonMapper.countByQuery(SqlQuery.from(FileRelation.class).equal(FileRelationInfo.FILEID, relation.getFileId()));
+                if (sameFileSize == 1) {
+                    FileBaseInfo baseInfo = commonMapper.selectById(FileBaseInfo.class, relation.getFileId());
+                    Assert.isTrue(baseInfo != null, "未找到实体文件信息");
+                    fileHandler.deleteFile(new DefaultBaseFile(baseInfo));
+                    count += commonMapper.deleteById(FileBaseInfo.class, relation.getFileId());
+                }
             }
         }
         count += commonMapper.deleteById(FileRelation.class, fileId);
@@ -387,8 +413,28 @@ public class DefaultCommonFileService extends AbstractCommonFileService implemen
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public long removeFileByRef(String refId, String refType, String groupCode) {
-        return 0;
+        //先查出来count==1的数据
+        List<FileBaseInfo> baseInfos = fileMapper.needDeleteBaseFiles(refId, refType, groupCode);
+        String[] idArr = new String[baseInfos.size()];
+
+        //删除关联表数据
+        long count = commonMapper.deleteByQuery(
+                buildParamsQuery(SqlQuery.from(FileRelation.class)
+                        , refId,
+                        refType,
+                        groupCode
+                )
+        );
+        //删除文件
+        for (int i = 0; i < baseInfos.size(); i++) {
+            FileBaseInfo baseInfo = baseInfos.get(i);
+            fileHandler.deleteFile(new DefaultBaseFile(baseInfo));
+            idArr[i] = baseInfo.getId();
+        }
+        count += commonMapper.deleteBatchIds(FileBaseInfo.class, idArr);
+        return count;
     }
 
 

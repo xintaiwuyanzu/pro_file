@@ -1,0 +1,10 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:test
+    username: sa
+    password: sa
+    includeModules: sys,common
+    autoDDl: update
+logging:
+  level:
+    com.dr.framework.common.dao: debug

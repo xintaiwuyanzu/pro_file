@@ -1,5 +1,10 @@
-package com.dr.framework.common.file.model;
+package com.dr.framework.common.file;
 
+/**
+ * 基本信息
+ *
+ * @author dr
+ */
 public interface BaseFile {
 
     /**
@@ -22,13 +27,6 @@ public interface BaseFile {
      * @return
      */
     String getSuffix();
-
-    /**
-     * 获取文件mine
-     *
-     * @return
-     */
-    String getMimeType();
 
     /**
      * 获取文件创建日期

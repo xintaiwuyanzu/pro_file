@@ -10,6 +10,8 @@ import com.dr.framework.common.file.model.FileInfo;
 class DefaultFileInfo extends DefaultBaseFile implements FileInfo {
     private String id;
     private String refId;
+    private String preId;
+    private String nextId;
     private String refType;
     private String groupCode;
     private String description;
@@ -70,6 +72,22 @@ class DefaultFileInfo extends DefaultBaseFile implements FileInfo {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public String getNextId() {
+        return nextId;
+    }
+
+    public void setNextId(String nextId) {
+        this.nextId = nextId;
+    }
+
+    public String getPreId() {
+        return preId;
+    }
+
+    public void setPreId(String preId) {
+        this.preId = preId;
     }
 }
 

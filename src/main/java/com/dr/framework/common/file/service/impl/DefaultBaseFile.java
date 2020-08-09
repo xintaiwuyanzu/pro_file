@@ -1,6 +1,6 @@
 package com.dr.framework.common.file.service.impl;
 
-import com.dr.framework.common.file.model.BaseFile;
+import com.dr.framework.common.file.BaseFile;
 
 /**
  * 默认的基本附件信息表
@@ -12,7 +12,6 @@ class DefaultBaseFile implements BaseFile {
     private String baseFileId;
     private String name;
     private String suffix;
-    private String mimeType;
     private long createDate;
     private long lastModifyDate;
     private long saveDate;
@@ -26,11 +25,10 @@ class DefaultBaseFile implements BaseFile {
         setBaseFileId(info.getId());
         setName(info.getOriginName());
         setSuffix(info.getSuffix());
-        setMimeType(info.getMimeType());
         setCreateDate(info.getOriginCreateDate());
         setLastModifyDate(info.getLastModifyDate());
-        setFileSize(info.getSize());
-        setFileHash(info.getHash());
+        setFileSize(info.getFileSize());
+        setFileHash(info.getFileHash());
     }
 
     @Override
@@ -58,15 +56,6 @@ class DefaultBaseFile implements BaseFile {
 
     public void setSuffix(String suffix) {
         this.suffix = suffix;
-    }
-
-    @Override
-    public String getMimeType() {
-        return mimeType;
-    }
-
-    public void setMimeType(String mimeType) {
-        this.mimeType = mimeType;
     }
 
     @Override

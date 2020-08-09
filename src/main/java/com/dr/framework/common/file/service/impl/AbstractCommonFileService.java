@@ -3,8 +3,8 @@ package com.dr.framework.common.file.service.impl;
 import com.dr.framework.common.dao.CommonMapper;
 import com.dr.framework.common.file.model.FileInfo;
 import com.dr.framework.common.file.service.CommonFileService;
-import com.dr.framework.common.file.service.FileHandler;
-import com.dr.framework.common.file.service.FileMineHandler;
+import com.dr.framework.common.file.FileHandler;
+import com.dr.framework.common.file.FileMineHandler;
 import com.dr.framework.core.orm.sql.support.SqlQuery;
 import com.dr.framework.core.security.SecurityHolder;
 import org.slf4j.Logger;
@@ -18,8 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /**
  * 实现类里面的代码太多了，一些简单的抽象放到这个里面实现
@@ -91,10 +90,32 @@ abstract class AbstractCommonFileService implements InitializingBean, Applicatio
 
     @Transactional(readOnly = true, rollbackFor = Exception.class)
     public List<FileInfo> list(String refId, String refType, String groupCode) {
-        return new ArrayList<>(commonMapper.selectByQuery(buildParamsQuery(buildFileInfoQuery(), refId, refType, groupCode)));
+        List<DefaultFileInfo> list = commonMapper.selectByQuery(buildParamsQuery(buildFileInfoQuery(), refId, refType, groupCode));
+        if (list.isEmpty()) {
+            return Collections.emptyList();
+        } else if (list.size() == 1) {
+            return new LinkedList<>(list);
+        } else {
+            Map<String, DefaultFileInfo> idMap = new HashMap<>();
+            LinkedList<FileInfo> linkedList = new LinkedList<>();
+            DefaultFileInfo key = null;
+            for (DefaultFileInfo f : list) {
+                if (f.getPreId() == null) {
+                    key = f;
+                } else {
+                    idMap.put(f.getId(), f);
+                }
+            }
+            linkedList.addFirst(key);
+            while (key.getNextId() != null) {
+                key = idMap.get(key.getNextId());
+                linkedList.addLast(key);
+            }
+            return linkedList;
+        }
     }
 
-    public static SqlQuery<DefaultFileInfo> buildFileInfoQuery() {
+    protected SqlQuery<DefaultFileInfo> buildFileInfoQuery() {
         return SqlQuery.from(FileRelation.class, false)
                 .column(
                         FileBaseInfoInfo.ID.alias("baseFileId"),
@@ -102,12 +123,13 @@ abstract class AbstractCommonFileService implements InitializingBean, Applicatio
                         FileBaseInfoInfo.SUFFIX,
                         FileBaseInfoInfo.ORIGINCREATEDATE.alias("createDate"),
                         FileBaseInfoInfo.LASTMODIFYDATE,
-                        FileBaseInfoInfo.SIZE.alias("fileSize"),
-                        FileBaseInfoInfo.HASH.alias("fileHash"),
-                        FileBaseInfoInfo.MIMETYPE.alias("mine"),
+                        FileBaseInfoInfo.FILESIZE,
+                        FileBaseInfoInfo.FILEHASH,
+                        FileBaseInfoInfo.MIMETYPE,
 
                         FileRelationInfo.ID,
                         FileRelationInfo.NEXTID,
+                        FileRelationInfo.PREID,
                         FileRelationInfo.REFID,
                         FileRelationInfo.REFTYPE,
                         FileRelationInfo.GROUPCODE,
@@ -118,7 +140,7 @@ abstract class AbstractCommonFileService implements InitializingBean, Applicatio
                 .setReturnClass(DefaultFileInfo.class);
     }
 
-    public static SqlQuery<FileRelation> buildRelationQuery() {
+    protected SqlQuery<FileRelation> buildRelationQuery() {
         return SqlQuery.from(FileRelation.class, false)
                 .column(
                         FileRelationInfo.ID,
@@ -161,6 +183,20 @@ abstract class AbstractCommonFileService implements InitializingBean, Applicatio
     protected <T> SqlQuery<T> buildLastQuery(SqlQuery<T> sqlQuery) {
         return sqlQuery.isNull(FileRelationInfo.NEXTID);
     }
+
+    protected long updateRelation(String updateId, String relationId, boolean isRelationPre) {
+        if (StringUtils.isEmpty(updateId)) {
+            return 0;
+        }
+        return commonMapper.updateByQuery(
+                SqlQuery.from(FileRelation.class, false)
+                        .set(isRelationPre ? FileRelationInfo.PREID : FileRelationInfo.NEXTID, relationId)
+                        .set(FileRelationInfo.UPDATEPERSON, getCurrentPersonId())
+                        .set(FileRelationInfo.UPDATEDATE, System.currentTimeMillis())
+                        .equal(FileRelationInfo.ID, updateId)
+        );
+    }
+
 
     protected String getCurrentPersonId() {
         SecurityHolder securityHolder = SecurityHolder.get();
