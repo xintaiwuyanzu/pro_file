@@ -1,5 +1,6 @@
 package com.dr.framework.common.file.service;
 
+import com.dr.framework.common.file.BaseFile;
 import com.dr.framework.common.file.FileResource;
 import com.dr.framework.common.file.model.FileInfo;
 import com.dr.framework.common.file.model.FileMeta;
@@ -46,6 +47,27 @@ public interface CommonFileService {
         return addFileLast(file, refId, refType, groupCode);
     }
 
+    default FileInfo addFile(String hash, String refId) {
+        return addFile(hash, refId, DEFAULT_REF_TYPE);
+    }
+
+    default FileInfo addFile(String hash, String refId, String refType) {
+        return addFile(hash, refId, refType, DEFAULT_GROUP_CODE);
+    }
+
+    /**
+     * 根据hash添加文件
+     *
+     * @param hash
+     * @param refId
+     * @param refType
+     * @param groupCode
+     * @return
+     */
+    default FileInfo addFile(String hash, String refId, String refType, String groupCode) {
+        return addFileLast(hash, refId, refType, groupCode);
+    }
+
     default FileInfo addFileFirst(FileResource file, String refId) throws IOException {
         return addFileFirst(file, refId, DEFAULT_REF_TYPE);
     }
@@ -64,6 +86,25 @@ public interface CommonFileService {
      * @return
      */
     FileInfo addFileFirst(FileResource file, String refId, String refType, String groupCode) throws IOException;
+
+    default FileInfo addFileFirst(String hash, String refId) {
+        return addFileFirst(hash, refId, DEFAULT_REF_TYPE);
+    }
+
+    default FileInfo addFileFirst(String hash, String refId, String refType) {
+        return addFileFirst(hash, refId, refType, DEFAULT_GROUP_CODE);
+    }
+
+    /**
+     * 在头部根据hash添加文件
+     *
+     * @param hash
+     * @param refId
+     * @param refType
+     * @param groupCode
+     * @return
+     */
+    FileInfo addFileFirst(String hash, String refId, String refType, String groupCode);
 
     default FileInfo addFileLast(FileResource file, String refId) throws IOException {
         return addFileLast(file, refId, DEFAULT_REF_TYPE);
@@ -84,6 +125,25 @@ public interface CommonFileService {
      */
     FileInfo addFileLast(FileResource file, String refId, String refType, String groupCode) throws IOException;
 
+    default FileInfo addFileLast(String hash, String refId) {
+        return addFileLast(hash, refId, DEFAULT_REF_TYPE);
+    }
+
+    default FileInfo addFileLast(String hash, String refId, String refType) {
+        return addFileLast(hash, refId, refType, DEFAULT_GROUP_CODE);
+    }
+
+    /**
+     * 根据hash在最后添加文件
+     *
+     * @param hash
+     * @param refId
+     * @param refType
+     * @param groupCode
+     * @return
+     */
+    FileInfo addFileLast(String hash, String refId, String refType, String groupCode);
+
     /**
      * 在指定的文件之前插入一条数据
      * <p>
@@ -96,6 +156,15 @@ public interface CommonFileService {
     FileInfo addFileBefore(FileResource file, String fileId) throws IOException;
 
     /**
+     * 根据hash 在指定的文件之前插入文件
+     *
+     * @param hash
+     * @param fileId
+     * @return
+     */
+    FileInfo addFileBefore(String hash, String fileId);
+
+    /**
      * 在指定的文件之后插入一条数据
      * <p>
      * 两个文件的业务外键，业务类型，还有分组类型都会是一样的
@@ -105,6 +174,15 @@ public interface CommonFileService {
      * @return
      */
     FileInfo addFileAfter(FileResource file, String fileId) throws IOException;
+
+    /**
+     * 根据hash 在指定的文件之后插入文件
+     *
+     * @param hash
+     * @param fileId
+     * @return
+     */
+    FileInfo addFileAfter(String hash, String fileId);
 
     /**
      * 给附件添加元数据信息，如果有元数据信息，则更新
@@ -217,6 +295,22 @@ public interface CommonFileService {
     FileInfo fileInfo(String fileId);
 
     /**
+     * 根据hash查找文件基本信息
+     *
+     * @param hash
+     * @return
+     */
+    BaseFile fileInfoByHash(String hash);
+
+    /**
+     * 指定的hash的文件是否存在
+     *
+     * @param hash
+     * @return
+     */
+    boolean existByHash(String hash);
+
+    /**
      * 获取指定文件的下一个文件
      *
      * @param fileId
@@ -278,6 +372,15 @@ public interface CommonFileService {
     OutputStream fileStream(String fileId) throws IOException;
 
     /**
+     * 根据Hash打开文件流
+     *
+     * @param hash
+     * @return
+     * @throws IOException
+     */
+    OutputStream fileStreamByHash(String hash) throws IOException;
+
+    /**
      * 复制指定的文件到新文件
      *
      * @param fileId
@@ -285,6 +388,16 @@ public interface CommonFileService {
      * @return
      */
     boolean copyTo(String fileId, String newFile) throws IOException;
+
+    /**
+     * 根据hash复制文件到新的文件
+     *
+     * @param fileHash
+     * @param newFile
+     * @return
+     * @throws IOException
+     */
+    boolean copyToByHash(String fileHash, String newFile) throws IOException;
 
     default long count(String refId) {
         return count(refId, DEFAULT_REF_TYPE);

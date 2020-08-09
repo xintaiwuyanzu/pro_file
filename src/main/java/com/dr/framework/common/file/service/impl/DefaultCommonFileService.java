@@ -1,5 +1,6 @@
 package com.dr.framework.common.file.service.impl;
 
+import com.dr.framework.common.file.BaseFile;
 import com.dr.framework.common.file.FileResource;
 import com.dr.framework.common.file.model.FileInfo;
 import com.dr.framework.common.file.model.FileMeta;
@@ -33,12 +34,30 @@ public class DefaultCommonFileService extends AbstractCommonFileService implemen
         return saveFile(file, refId, refType, groupCode, null, firstFile == null ? null : firstFile.getId());
     }
 
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public FileInfo addFileFirst(String hash, String refId, String refType, String groupCode) {
+        FileBaseInfo baseInfo = baseInfoByHash(hash);
+        Assert.isTrue(baseInfo != null, "指定hash的文件不存在！");
+        FileRelation firstFile = first(refId, refType, groupCode);
+        return saveFile(baseInfo, null, refId, refType, groupCode, null, firstFile == null ? null : firstFile.getId());
+    }
+
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public FileInfo addFileLast(FileResource file, String refId, String refType, String groupCode) throws IOException {
         FileRelation lastFile = last(refId, refType, groupCode);
         return saveFile(file, refId, refType, groupCode, lastFile == null ? null : lastFile.getId(), null);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public FileInfo addFileLast(String hash, String refId, String refType, String groupCode) {
+        FileBaseInfo baseInfo = baseInfoByHash(hash);
+        Assert.isTrue(baseInfo != null, "指定hash的文件不存在！");
+        FileRelation lastFile = last(refId, refType, groupCode);
+        return saveFile(baseInfo, null, refId, refType, groupCode, lastFile == null ? null : lastFile.getId(), null);
     }
 
     @Override
@@ -54,6 +73,20 @@ public class DefaultCommonFileService extends AbstractCommonFileService implemen
 
     @Override
     @Transactional(rollbackFor = Exception.class)
+    public FileInfo addFileBefore(String hash, String fileId) {
+        FileBaseInfo baseInfo = baseInfoByHash(hash);
+        Assert.isTrue(baseInfo != null, "指定hash的文件不存在！");
+        FileRelation relation = file(fileId);
+        return saveFile(
+                baseInfo,
+                null,
+                relation.getRefId(), relation.getRefType(), relation.getGroupCode(),
+                relation.getPreId(), relation.getId()
+        );
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
     public FileInfo addFileAfter(FileResource file, String fileId) throws IOException {
         FileRelation relation = file(fileId);
         return saveFile(
@@ -62,6 +95,21 @@ public class DefaultCommonFileService extends AbstractCommonFileService implemen
                 relation.getId(), relation.getNextId()
         );
     }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public FileInfo addFileAfter(String hash, String fileId) {
+        FileBaseInfo baseInfo = baseInfoByHash(hash);
+        Assert.isTrue(baseInfo != null, "指定hash的文件不存在！");
+        FileRelation relation = file(fileId);
+        return saveFile(
+                baseInfo,
+                null,
+                relation.getRefId(), relation.getRefType(), relation.getGroupCode(),
+                relation.getId(), relation.getNextId()
+        );
+    }
+
 
     //TODO 可能要自己写事务
     @Transactional(rollbackFor = Exception.class)
@@ -109,12 +157,20 @@ public class DefaultCommonFileService extends AbstractCommonFileService implemen
                              String refId, String refType, String groupCode,
                              String preId, String nextId) throws IOException {
         FileBaseInfo fileBaseInfo = saveBaseFile(file);
+        return saveFile(fileBaseInfo, file.getDescription(), refId, refType, groupCode, preId, nextId);
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public FileInfo saveFile(FileBaseInfo fileBaseInfo,
+                             String desc,
+                             String refId, String refType, String groupCode,
+                             String preId, String nextId) {
         //创建关联表信息
         FileRelation fileRelation = new FileRelation();
         //绑定创建人信息
         CommonService.bindCreateInfo(fileRelation);
         //绑定基本信息
-        fileRelation.setDescription(file.getDescription());
+        fileRelation.setDescription(desc);
         fileRelation.setFileId(fileBaseInfo.getId());
         //绑定关联信息
         fileRelation.setRefId(refId);
@@ -314,6 +370,29 @@ public class DefaultCommonFileService extends AbstractCommonFileService implemen
         return count;
     }
 
+    protected FileBaseInfo baseInfoByHash(String hash) {
+        Assert.isTrue(!StringUtils.isEmpty(hash), "文件hash不能为空！");
+        return commonMapper.selectOneByQuery(SqlQuery.from(FileBaseInfo.class).equal(FileBaseInfoInfo.FILEHASH, hash));
+    }
+
+    @Override
+    @Transactional(readOnly = true, rollbackFor = Exception.class)
+    public BaseFile fileInfoByHash(String hash) {
+        FileBaseInfo baseInfo = baseInfoByHash(hash);
+        if (baseInfo == null) {
+            return null;
+        } else {
+            return new DefaultBaseFile(baseInfo);
+        }
+    }
+
+    @Override
+    @Transactional(readOnly = true, rollbackFor = Exception.class)
+    public boolean existByHash(String hash) {
+        Assert.isTrue(!StringUtils.isEmpty(hash), "文件hash不能为空！");
+        return commonMapper.existsByQuery(SqlQuery.from(FileBaseInfo.class).equal(FileBaseInfoInfo.FILEHASH, hash));
+    }
+
     @Override
     @Transactional(readOnly = true, rollbackFor = Exception.class)
     public List<FileMeta> getFileMeta(String fileId, boolean includeBaseFile) {
@@ -338,9 +417,24 @@ public class DefaultCommonFileService extends AbstractCommonFileService implemen
     }
 
     @Override
+    public OutputStream fileStreamByHash(String hash) throws IOException {
+        BaseFile fileInfo = fileInfoByHash(hash);
+        Assert.isTrue(fileInfo != null, "指定的文件不存在！");
+        return fileHandler.openStream(fileInfo);
+    }
+
+    @Override
     public boolean copyTo(String fileId, String newFile) throws IOException {
         Assert.isTrue(!StringUtils.isEmpty(newFile), "新文件路径不能为空！");
         FileInfo fileInfo = fileInfo(fileId);
+        Assert.isTrue(fileInfo != null, "指定的文件不存在！");
+        return fileHandler.copyTo(fileInfo, newFile);
+    }
+
+    @Override
+    public boolean copyToByHash(String fileHash, String newFile) throws IOException {
+        Assert.isTrue(!StringUtils.isEmpty(newFile), "新文件路径不能为空！");
+        BaseFile fileInfo = fileInfoByHash(fileHash);
         Assert.isTrue(fileInfo != null, "指定的文件不存在！");
         return fileHandler.copyTo(fileInfo, newFile);
     }
