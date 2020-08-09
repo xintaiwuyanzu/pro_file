@@ -45,6 +45,7 @@ class DefaultFileMeta implements FileMeta {
         this.fileId = fileId;
     }
 
+    @Override
     public boolean isBase() {
         return base;
     }

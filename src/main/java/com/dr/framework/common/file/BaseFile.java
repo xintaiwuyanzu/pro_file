@@ -63,4 +63,10 @@ public interface BaseFile {
      */
     String getFileHash();
 
+    /**
+     * 文件媒体类型
+     *
+     * @return
+     */
+    String getMimeType();
 }

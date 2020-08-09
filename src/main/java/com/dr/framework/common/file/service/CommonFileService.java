@@ -1,10 +1,11 @@
 package com.dr.framework.common.file.service;
 
+import com.dr.framework.common.file.FileResource;
 import com.dr.framework.common.file.model.FileInfo;
 import com.dr.framework.common.file.model.FileMeta;
-import com.dr.framework.common.file.FileResource;
 
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.List;
 
 /**
@@ -267,6 +268,23 @@ public interface CommonFileService {
      * @return
      */
     List<FileInfo> list(String refId, String refType, String groupCode);
+
+    /**
+     * 获取文件输出流
+     *
+     * @param fileId
+     * @return
+     */
+    OutputStream fileStream(String fileId) throws IOException;
+
+    /**
+     * 复制指定的文件到新文件
+     *
+     * @param fileId
+     * @param newFile
+     * @return
+     */
+    boolean copyTo(String fileId, String newFile) throws IOException;
 
     default long count(String refId) {
         return count(refId, DEFAULT_REF_TYPE);

@@ -9,10 +9,13 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.system.ApplicationHome;
 import org.springframework.stereotype.Component;
+import org.springframework.util.Assert;
 import org.springframework.util.StreamUtils;
 import org.springframework.util.StringUtils;
 
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Date;
 
 /**
@@ -85,6 +88,25 @@ public class DefaultFileHandler implements FileHandler, InitializingBean {
         if (sysFile.exists()) {
             sysFile.delete();
         }
+    }
+
+    @Override
+    public OutputStream openStream(BaseFile fileInfo) throws IOException {
+        String path = buildFilePath(fileInfo);
+        return new FileOutputStream(path);
+    }
+
+    @Override
+    public boolean copyTo(BaseFile fileInfo, String newFile) throws IOException {
+        String path = buildFilePath(fileInfo);
+
+        File file = new File(newFile);
+        Assert.isTrue(!file.exists(), "指定的文件已存在！");
+        if (!file.getParentFile().exists()) {
+            file.getParentFile().mkdirs();
+        }
+        Files.copy(Paths.get(path), Paths.get(newFile));
+        return true;
     }
 
     @Override

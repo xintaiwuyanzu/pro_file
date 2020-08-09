@@ -1,9 +1,19 @@
 package com.dr.framework.common.file.autoconfig;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.util.unit.DataSize;
 
-@ConfigurationProperties(prefix = "dr.common.file")
+/**
+ * 文件相关的配置
+ *
+ * @author dr
+ */
+@ConfigurationProperties(prefix = "common.file")
 public class CommonFileConfig {
+    /**
+     * 网页端访问路径
+     */
+    private String webPath = "files";
     /**
      * 所有文件存放位置
      */
@@ -11,12 +21,19 @@ public class CommonFileConfig {
     /**
      * 最大文件上传大小
      */
-    private long maxUploadSize;
+    private DataSize maxUploadSize = DataSize.ofMegabytes(200);
     /**
-     * 跟文件夹名称
+     * 根文件夹名称
      */
     private String rootDirName = "files";
 
+    public String getWebPath() {
+        return webPath;
+    }
+
+    public void setWebPath(String webPath) {
+        this.webPath = webPath;
+    }
 
     public String getFileLocation() {
         return fileLocation;
@@ -26,11 +43,11 @@ public class CommonFileConfig {
         this.fileLocation = fileLocation;
     }
 
-    public long getMaxUploadSize() {
+    public DataSize getMaxUploadSize() {
         return maxUploadSize;
     }
 
-    public void setMaxUploadSize(long maxUploadSize) {
+    public void setMaxUploadSize(DataSize maxUploadSize) {
         this.maxUploadSize = maxUploadSize;
     }
 

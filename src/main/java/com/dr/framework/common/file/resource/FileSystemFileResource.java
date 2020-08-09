@@ -17,8 +17,8 @@ import java.util.UUID;
  * @author dr
  */
 public class FileSystemFileResource implements FileResource {
-    private File file;
-    private String description;
+    private final File file;
+    private final String description;
 
     public FileSystemFileResource(String filePath) {
         this(new File(filePath), null);
@@ -51,16 +51,6 @@ public class FileSystemFileResource implements FileResource {
     @Override
     public String getName() {
         return file.getName();
-    }
-
-    @Override
-    public String getSuffix() {
-        String name = getName();
-        if (name.contains(".")) {
-            return name.substring(name.lastIndexOf(".") + 1);
-        } else {
-            return "";
-        }
     }
 
     @Override

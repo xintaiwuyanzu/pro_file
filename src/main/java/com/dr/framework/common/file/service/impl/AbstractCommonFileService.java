@@ -1,10 +1,10 @@
 package com.dr.framework.common.file.service.impl;
 
 import com.dr.framework.common.dao.CommonMapper;
-import com.dr.framework.common.file.model.FileInfo;
-import com.dr.framework.common.file.service.CommonFileService;
 import com.dr.framework.common.file.FileHandler;
 import com.dr.framework.common.file.FileMineHandler;
+import com.dr.framework.common.file.model.FileInfo;
+import com.dr.framework.common.file.service.CommonFileService;
 import com.dr.framework.core.orm.sql.support.SqlQuery;
 import com.dr.framework.core.security.SecurityHolder;
 import org.slf4j.Logger;
@@ -96,7 +96,7 @@ abstract class AbstractCommonFileService implements InitializingBean, Applicatio
         } else if (list.size() == 1) {
             return new LinkedList<>(list);
         } else {
-            Map<String, DefaultFileInfo> idMap = new HashMap<>();
+            Map<String, DefaultFileInfo> idMap = new HashMap<>(list.size() - 1);
             LinkedList<FileInfo> linkedList = new LinkedList<>();
             DefaultFileInfo key = null;
             for (DefaultFileInfo f : list) {

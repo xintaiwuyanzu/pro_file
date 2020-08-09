@@ -1,5 +1,7 @@
 package com.dr.framework.common.file;
 
+import org.springframework.util.StringUtils;
+
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -32,7 +34,14 @@ public interface FileResource {
      *
      * @return
      */
-    String getSuffix();
+    default String getSuffix() {
+        String name = getName();
+        if (!StringUtils.isEmpty(name) && name.contains(".")) {
+            return name.substring(name.lastIndexOf(".") + 1);
+        } else {
+            return "";
+        }
+    }
 
     /**
      * 获取文件创建日期

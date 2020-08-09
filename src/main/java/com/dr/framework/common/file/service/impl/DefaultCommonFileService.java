@@ -1,8 +1,8 @@
 package com.dr.framework.common.file.service.impl;
 
+import com.dr.framework.common.file.FileResource;
 import com.dr.framework.common.file.model.FileInfo;
 import com.dr.framework.common.file.model.FileMeta;
-import com.dr.framework.common.file.FileResource;
 import com.dr.framework.common.file.service.CommonFileService;
 import com.dr.framework.common.service.CommonService;
 import com.dr.framework.core.orm.sql.support.SqlQuery;
@@ -12,6 +12,7 @@ import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -327,6 +328,21 @@ public class DefaultCommonFileService extends AbstractCommonFileService implemen
         return commonMapper.selectByQuery(fileMetaDataSqlQuery)
                 .stream().map(DefaultFileMeta::new)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public OutputStream fileStream(String fileId) throws IOException {
+        FileInfo fileInfo = fileInfo(fileId);
+        Assert.isTrue(fileInfo != null, "指定的文件不存在！");
+        return fileHandler.openStream(fileInfo);
+    }
+
+    @Override
+    public boolean copyTo(String fileId, String newFile) throws IOException {
+        Assert.isTrue(!StringUtils.isEmpty(newFile), "新文件路径不能为空！");
+        FileInfo fileInfo = fileInfo(fileId);
+        Assert.isTrue(fileInfo != null, "指定的文件不存在！");
+        return fileHandler.copyTo(fileInfo, newFile);
     }
 
 

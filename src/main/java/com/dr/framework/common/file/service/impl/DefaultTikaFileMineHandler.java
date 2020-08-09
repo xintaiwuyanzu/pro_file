@@ -12,8 +12,8 @@ import org.slf4j.LoggerFactory;
  * @author dr
  */
 public class DefaultTikaFileMineHandler implements FileMineHandler {
-    Logger logger = LoggerFactory.getLogger(DefaultTikaFileMineHandler.class);
-    Tika tika = new Tika();
+    final Logger logger = LoggerFactory.getLogger(DefaultTikaFileMineHandler.class);
+    final Tika tika = new Tika();
 
     @Override
     public String fileMine(FileResource resource) {

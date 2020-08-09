@@ -29,10 +29,10 @@ public class TestService {
         commonFileService.addFile(new FileSystemFileResource("d:/backup6.log", "ccc"), "aaa");
         commonFileService.addFile(new FileSystemFileResource("d:/backup6.log", "ddd"), "aaa");
         List<FileInfo> fileInfos = commonFileService.list("aaa");
-        Assert.assertTrue(fileInfos.size() == 4);
+        Assert.assertEquals(4, fileInfos.size());
         commonFileService.removeFile(fileInfos.get(2).getId());
         fileInfos = commonFileService.list("aaa");
-        Assert.assertTrue(fileInfos.size() == 3);
+        Assert.assertEquals(3, fileInfos.size());
     }
 
 }
