@@ -16,8 +16,7 @@ class DefaultBaseFile implements BaseFile {
     private long lastModifyDate;
     private long saveDate;
     private long fileSize;
-    private String fileHash;
-    private String mimeType;
+
 
     public DefaultBaseFile() {
     }
@@ -30,8 +29,6 @@ class DefaultBaseFile implements BaseFile {
         setCreateDate(info.getOriginCreateDate());
         setLastModifyDate(info.getLastModifyDate());
         setFileSize(info.getFileSize());
-        setFileHash(info.getFileHash());
-        setMimeType(info.getMimeType());
     }
 
     @Override
@@ -95,23 +92,5 @@ class DefaultBaseFile implements BaseFile {
 
     public void setFileSize(long fileSize) {
         this.fileSize = fileSize;
-    }
-
-    @Override
-    public String getFileHash() {
-        return fileHash;
-    }
-
-    public void setFileHash(String fileHash) {
-        this.fileHash = fileHash;
-    }
-
-    @Override
-    public String getMimeType() {
-        return mimeType;
-    }
-
-    public void setMimeType(String mimeType) {
-        this.mimeType = mimeType;
     }
 }

@@ -1,15 +1,12 @@
 package com.dr.framework.common.file.resource;
 
 import com.dr.framework.common.file.FileResource;
-import com.google.common.hash.Hashing;
-import com.google.common.io.Files;
 import org.springframework.util.Assert;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.UUID;
 
 /**
  * 系统文件
@@ -67,15 +64,5 @@ public class FileSystemFileResource implements FileResource {
     @Override
     public long getFileSize() {
         return file.length();
-    }
-
-    @Override
-    public String getFileHash() {
-        try {
-            return Files.asByteSource(file).hash(Hashing.sha512()).toString();
-        } catch (IOException e) {
-            e.printStackTrace();
-            return UUID.randomUUID().toString();
-        }
     }
 }

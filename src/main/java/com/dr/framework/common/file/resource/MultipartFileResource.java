@@ -1,21 +1,18 @@
 package com.dr.framework.common.file.resource;
 
 import com.dr.framework.common.file.FileResource;
-import com.google.common.hash.Hashing;
-import com.google.common.io.ByteSource;
 import org.springframework.util.Assert;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.UUID;
 
 /**
  * spring上传附件
  *
  * @author dr
  */
-public class MultipartFileResource extends ByteSource implements FileResource {
+public class MultipartFileResource implements FileResource {
     private final MultipartFile multipartFile;
 
     public MultipartFileResource(MultipartFile multipartFile) {
@@ -41,21 +38,6 @@ public class MultipartFileResource extends ByteSource implements FileResource {
     @Override
     public long getFileSize() {
         return multipartFile.getSize();
-    }
-
-    @Override
-    public InputStream openStream() throws IOException {
-        return getInputStream();
-    }
-
-    @Override
-    public String getFileHash() {
-        try {
-            return hash(Hashing.sha512()).toString();
-        } catch (IOException e) {
-            e.printStackTrace();
-            return UUID.randomUUID().toString();
-        }
     }
 
     @Override

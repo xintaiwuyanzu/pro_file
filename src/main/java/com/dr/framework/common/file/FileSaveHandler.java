@@ -13,7 +13,7 @@ import java.io.OutputStream;
  *
  * @author dr
  */
-public interface FileHandler extends Ordered {
+public interface FileSaveHandler extends Ordered {
     /**
      * 是否能够处理指定类型的文件
      *
@@ -50,16 +50,6 @@ public interface FileHandler extends Ordered {
     void deleteFile(BaseFile fileInfo);
 
     /**
-     * 默认最低的，高级的可以实现自定义拦截
-     *
-     * @return
-     */
-    @Override
-    default int getOrder() {
-        return LOWEST_PRECEDENCE;
-    }
-
-    /**
      * 打开输出文件流
      *
      * @param fileInfo
@@ -76,4 +66,15 @@ public interface FileHandler extends Ordered {
      * @throws IOException
      */
     boolean copyTo(BaseFile fileInfo, String newFile) throws IOException;
+
+    /**
+     * 默认最低的，高级的可以实现自定义拦截
+     *
+     * @return
+     */
+    @Override
+    default int getOrder() {
+        return LOWEST_PRECEDENCE;
+    }
+
 }

@@ -1,9 +1,9 @@
 package com.dr.framework.common.file.autoconfig;
 
+import com.dr.framework.common.file.FileInfoHandler;
 import com.dr.framework.common.file.service.CommonFileService;
-import com.dr.framework.common.file.FileMineHandler;
 import com.dr.framework.common.file.service.impl.DefaultCommonFileService;
-import com.dr.framework.common.file.service.impl.DefaultTikaFileMineHandler;
+import com.dr.framework.common.file.service.impl.DefaultFileInfoHandler;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -27,8 +27,8 @@ class CommonFileAutoConfig {
 
     @Bean
     @ConditionalOnMissingBean
-    FileMineHandler fileMineHandler() {
-        return new DefaultTikaFileMineHandler();
+    FileInfoHandler fileInfoHandler() {
+        return new DefaultFileInfoHandler();
     }
 
 }

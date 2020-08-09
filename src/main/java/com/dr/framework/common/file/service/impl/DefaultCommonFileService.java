@@ -115,13 +115,11 @@ public class DefaultCommonFileService extends AbstractCommonFileService implemen
     @Transactional(rollbackFor = Exception.class)
     public FileBaseInfo saveBaseFile(FileResource file) throws IOException {
         Assert.isTrue(file != null, "要添加的文件不能为空!");
-        String hash = file.getFileHash();
+
+        String hash = fileInfoHandler.fileHash(file);
         Assert.isTrue(!StringUtils.isEmpty(hash), "文件hash值不能为空！");
         //先查询相同hash的文件是否存在
-        FileBaseInfo fileBaseInfo = commonMapper.selectOneByQuery(
-                SqlQuery.from(FileBaseInfo.class)
-                        .equal(FileBaseInfoInfo.FILEHASH, hash)
-        );
+        FileBaseInfo fileBaseInfo = baseInfoByHash(hash);
         if (fileBaseInfo == null) {
             fileBaseInfo = new FileBaseInfo();
             CommonService.bindCreateInfo(fileBaseInfo);
@@ -131,10 +129,10 @@ public class DefaultCommonFileService extends AbstractCommonFileService implemen
             fileBaseInfo.setLastModifyDate(file.getLastModifyDate());
             fileBaseInfo.setSuffix(file.getSuffix());
             fileBaseInfo.setOriginName(file.getName());
-            fileBaseInfo.setMimeType(mineHandler.fileMine(file));
+            fileBaseInfo.setMimeType(fileInfoHandler.fileMine(file));
 
             //如果是新文件，保存文件流，插入基本信息数据
-            fileHandler.writeFile(file, new DefaultBaseFile(fileBaseInfo));
+            fileSaveHandler.writeFile(file, new DefaultBaseFile(fileBaseInfo));
             commonMapper.insert(fileBaseInfo);
         }
         return fileBaseInfo;
@@ -413,14 +411,14 @@ public class DefaultCommonFileService extends AbstractCommonFileService implemen
     public OutputStream fileStream(String fileId) throws IOException {
         FileInfo fileInfo = fileInfo(fileId);
         Assert.isTrue(fileInfo != null, "指定的文件不存在！");
-        return fileHandler.openStream(fileInfo);
+        return fileSaveHandler.openStream(fileInfo);
     }
 
     @Override
     public OutputStream fileStreamByHash(String hash) throws IOException {
         BaseFile fileInfo = fileInfoByHash(hash);
         Assert.isTrue(fileInfo != null, "指定的文件不存在！");
-        return fileHandler.openStream(fileInfo);
+        return fileSaveHandler.openStream(fileInfo);
     }
 
     @Override
@@ -428,7 +426,7 @@ public class DefaultCommonFileService extends AbstractCommonFileService implemen
         Assert.isTrue(!StringUtils.isEmpty(newFile), "新文件路径不能为空！");
         FileInfo fileInfo = fileInfo(fileId);
         Assert.isTrue(fileInfo != null, "指定的文件不存在！");
-        return fileHandler.copyTo(fileInfo, newFile);
+        return fileSaveHandler.copyTo(fileInfo, newFile);
     }
 
     @Override
@@ -436,7 +434,7 @@ public class DefaultCommonFileService extends AbstractCommonFileService implemen
         Assert.isTrue(!StringUtils.isEmpty(newFile), "新文件路径不能为空！");
         BaseFile fileInfo = fileInfoByHash(fileHash);
         Assert.isTrue(fileInfo != null, "指定的文件不存在！");
-        return fileHandler.copyTo(fileInfo, newFile);
+        return fileSaveHandler.copyTo(fileInfo, newFile);
     }
 
 
@@ -513,7 +511,7 @@ public class DefaultCommonFileService extends AbstractCommonFileService implemen
                 if (sameFileSize == 1) {
                     FileBaseInfo baseInfo = commonMapper.selectById(FileBaseInfo.class, relation.getFileId());
                     Assert.isTrue(baseInfo != null, "未找到实体文件信息");
-                    fileHandler.deleteFile(new DefaultBaseFile(baseInfo));
+                    fileSaveHandler.deleteFile(new DefaultBaseFile(baseInfo));
                     count += commonMapper.deleteById(FileBaseInfo.class, relation.getFileId());
                 }
             }
@@ -540,7 +538,7 @@ public class DefaultCommonFileService extends AbstractCommonFileService implemen
         //删除文件
         for (int i = 0; i < baseInfos.size(); i++) {
             FileBaseInfo baseInfo = baseInfos.get(i);
-            fileHandler.deleteFile(new DefaultBaseFile(baseInfo));
+            fileSaveHandler.deleteFile(new DefaultBaseFile(baseInfo));
             idArr[i] = baseInfo.getId();
         }
         count += commonMapper.deleteBatchIds(FileBaseInfo.class, idArr);

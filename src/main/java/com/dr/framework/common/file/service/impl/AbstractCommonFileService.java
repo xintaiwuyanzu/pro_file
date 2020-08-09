@@ -1,8 +1,8 @@
 package com.dr.framework.common.file.service.impl;
 
 import com.dr.framework.common.dao.CommonMapper;
-import com.dr.framework.common.file.FileHandler;
-import com.dr.framework.common.file.FileMineHandler;
+import com.dr.framework.common.file.FileInfoHandler;
+import com.dr.framework.common.file.FileSaveHandler;
 import com.dr.framework.common.file.model.FileInfo;
 import com.dr.framework.common.file.service.CommonFileService;
 import com.dr.framework.core.orm.sql.support.SqlQuery;
@@ -32,9 +32,8 @@ abstract class AbstractCommonFileService implements InitializingBean, Applicatio
     @Autowired
     protected ApplicationContext applicationContext;
     @Autowired
-    protected FileMineHandler mineHandler;
-
-    protected FileHandler fileHandler;
+    protected FileInfoHandler fileInfoHandler;
+    protected FileSaveHandler fileSaveHandler;
 
     @Transactional(readOnly = true, rollbackFor = Exception.class)
     protected FileRelation file(String fileId) {
@@ -208,8 +207,8 @@ abstract class AbstractCommonFileService implements InitializingBean, Applicatio
 
     @Override
     public void afterPropertiesSet() {
-        fileHandler = new FileHandlerComposite(
-                applicationContext.getBeansOfType(FileHandler.class)
+        fileSaveHandler = new FileHandlerComposite(
+                applicationContext.getBeansOfType(FileSaveHandler.class)
                         .values()
         );
     }

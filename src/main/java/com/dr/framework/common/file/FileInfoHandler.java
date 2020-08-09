@@ -5,7 +5,7 @@ package com.dr.framework.common.file;
  *
  * @author dr
  */
-public interface FileMineHandler {
+public interface FileInfoHandler {
     /**
      * 获取文件mine
      *
@@ -13,4 +13,12 @@ public interface FileMineHandler {
      * @return
      */
     String fileMine(FileResource resource);
+
+    /**
+     * 获取文件hash
+     *
+     * @param resource
+     * @return
+     */
+    String fileHash(FileResource resource);
 }

@@ -15,6 +15,8 @@ class DefaultFileInfo extends DefaultBaseFile implements FileInfo {
     private String refType;
     private String groupCode;
     private String description;
+    private String fileHash;
+    private String mimeType;
 
     public DefaultFileInfo(FileBaseInfo base, FileRelation relation) {
         super(base);
@@ -23,6 +25,9 @@ class DefaultFileInfo extends DefaultBaseFile implements FileInfo {
         setRefType(relation.getRefType());
         setGroupCode(relation.getGroupCode());
         setDescription(relation.getDescription());
+
+        setFileHash(base.getFileHash());
+        setMimeType(base.getMimeType());
     }
 
     public DefaultFileInfo() {
@@ -88,6 +93,24 @@ class DefaultFileInfo extends DefaultBaseFile implements FileInfo {
 
     public void setPreId(String preId) {
         this.preId = preId;
+    }
+
+    @Override
+    public String getFileHash() {
+        return fileHash;
+    }
+
+    public void setFileHash(String fileHash) {
+        this.fileHash = fileHash;
+    }
+
+    @Override
+    public String getMimeType() {
+        return mimeType;
+    }
+
+    public void setMimeType(String mimeType) {
+        this.mimeType = mimeType;
     }
 }
 

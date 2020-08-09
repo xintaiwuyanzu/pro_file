@@ -1,8 +1,8 @@
 package com.dr.framework.common.file.service.impl;
 
 import com.dr.framework.common.file.BaseFile;
-import com.dr.framework.common.file.FileHandler;
 import com.dr.framework.common.file.FileResource;
+import com.dr.framework.common.file.FileSaveHandler;
 import com.dr.framework.common.file.autoconfig.CommonFileConfig;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.springframework.beans.factory.InitializingBean;
@@ -24,7 +24,7 @@ import java.util.Date;
  * @author dr
  */
 @Component
-public class DefaultFileHandler implements FileHandler, InitializingBean {
+public class DefaultFileHandler implements FileSaveHandler, InitializingBean {
     @Autowired
     protected CommonFileConfig fileConfig;
     /**

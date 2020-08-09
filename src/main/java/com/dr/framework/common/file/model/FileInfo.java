@@ -42,4 +42,18 @@ public interface FileInfo extends BaseFile {
      * @return
      */
     String getDescription();
+
+    /**
+     * 获取文件hash值
+     *
+     * @return
+     */
+    String getFileHash();
+
+    /**
+     * 文件媒体类型
+     *
+     * @return
+     */
+    String getMimeType();
 }

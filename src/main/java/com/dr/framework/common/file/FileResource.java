@@ -65,13 +65,6 @@ public interface FileResource {
     long getFileSize();
 
     /**
-     * 获取文件hash值
-     *
-     * @return
-     */
-    String getFileHash();
-
-    /**
      * 获取文件描述
      *
      * @return
