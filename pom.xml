@@ -6,7 +6,7 @@
 
     <groupId>com.dr.framework.common</groupId>
     <artifactId>file</artifactId>
-    <version>0.0.2-SNAPSHOT</version>
+    <version>0.0.1-SNAPSHOT</version>
     <properties>
         <framework.version>0.0.5-SNAPSHOT</framework.version>
         <maven.compiler.encoding>UTF-8</maven.compiler.encoding>
