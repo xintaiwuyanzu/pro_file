@@ -1,5 +1,6 @@
 package com.dr.framework.common.file.service.impl;
 
+import com.dr.framework.common.config.model.CommonMeta;
 import com.dr.framework.common.file.model.FileMeta;
 
 /**
@@ -11,11 +12,11 @@ class DefaultFileMeta implements FileMeta {
     private String fileId;
     private boolean base;
 
-    public DefaultFileMeta(FileMetaData fileMetaData) {
-        setKey(fileMetaData.getKey());
-        setValue(fileMetaData.getValue());
-        setBase(fileMetaData.getRefType() == 0);
-        setFileId(fileMetaData.getRefId());
+    public DefaultFileMeta(CommonMeta meta) {
+        setFileId(meta.getRefId());
+        setKey(meta.getKey());
+        setValue(meta.getValue());
+        setBase(DefaultCommonFileService.META_REF_TYPE_BASE.equals(meta.getRefType()));
     }
 
     @Override

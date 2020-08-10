@@ -1,5 +1,7 @@
 package com.dr.framework.common.file.service.impl;
 
+import com.dr.framework.common.config.model.CommonMeta;
+import com.dr.framework.common.config.service.CommonMetaService;
 import com.dr.framework.common.file.BaseFile;
 import com.dr.framework.common.file.FileResource;
 import com.dr.framework.common.file.model.FileInfo;
@@ -24,7 +26,9 @@ import java.util.stream.Collectors;
  */
 public class DefaultCommonFileService extends AbstractCommonFileService implements CommonFileService {
     @Autowired
-    CommonFileMapper fileMapper;
+    protected CommonFileMapper fileMapper;
+    @Autowired
+    protected CommonMetaService commonMetaService;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -196,45 +200,12 @@ public class DefaultCommonFileService extends AbstractCommonFileService implemen
         doSetMeta(fileId, key, value, true);
     }
 
+    public static final String META_REF_TYPE_BASE = "file_base";
+    public static final String META_REF_TYPE_RELATION = "file_relation";
+
     @Transactional(rollbackFor = Exception.class)
     public void doSetMeta(String fileId, String key, String value, boolean base) {
-        Assert.isTrue(!StringUtils.isEmpty(fileId), "文件Id不能为空！");
-        Assert.isTrue(!StringUtils.isEmpty(key), "元数据编码不能为空！");
-        Assert.isTrue(commonMapper.exists(base ? FileBaseInfo.class : FileRelation.class, fileId), "指定的文件不存在！");
-        FileMetaData fileMetaData = commonMapper.selectOneByQuery(
-                SqlQuery.from(FileMetaData.class)
-                        .equal(FileMetaDataInfo.REFID, fileId)
-                        .equal(FileMetaDataInfo.REFTYPE, base ? 0 : 1)
-                        .equal(FileMetaDataInfo.KEY, key)
-        );
-        boolean valueExist = StringUtils.isEmpty(value);
-
-        if (fileMetaData == null) {
-            //元数据不存在
-            if (valueExist) {
-                //key value 不为空则插入元数据
-                fileMetaData = new FileMetaData();
-                CommonService.bindCreateInfo(fileMetaData);
-                fileMetaData.setRefId(fileId);
-                fileMetaData.setRefType(base ? 0 : 1);
-                fileMetaData.setKey(key);
-                fileMetaData.setValue(value);
-                commonMapper.insert(fileMetaData);
-            }
-        } else {
-            //元数据存在
-            if (valueExist) {
-                //value 不同则更新元数据
-                if (!value.equals(fileMetaData.getValue())) {
-                    fileMetaData.setValue(value);
-                    CommonService.bindCreateInfo(fileMetaData);
-                    commonMapper.updateIgnoreNullById(fileMetaData);
-                }
-            } else {
-                //value为空则删除元数据
-                commonMapper.deleteById(FileMetaData.class, fileMetaData.getId());
-            }
-        }
+        commonMetaService.setMetaData(fileId, base ? META_REF_TYPE_BASE : META_REF_TYPE_RELATION, key, value);
     }
 
     @Override
@@ -396,15 +367,11 @@ public class DefaultCommonFileService extends AbstractCommonFileService implemen
     public List<FileMeta> getFileMeta(String fileId, boolean includeBaseFile) {
         Assert.isTrue(!StringUtils.isEmpty(fileId), "文件Id不能为空！");
         FileRelation fileRelation = file(fileId);
-        SqlQuery<FileMetaData> fileMetaDataSqlQuery = SqlQuery.from(FileMetaData.class);
+        List<CommonMeta> metas = commonMetaService.metaList(fileId, META_REF_TYPE_RELATION);
         if (includeBaseFile) {
-            fileMetaDataSqlQuery.in(FileMetaDataInfo.REFID, fileId, fileRelation.getFileId());
-        } else {
-            fileMetaDataSqlQuery.equal(FileMetaDataInfo.REFID, fileId);
+            metas.addAll(commonMetaService.metaList(fileId, META_REF_TYPE_BASE));
         }
-        return commonMapper.selectByQuery(fileMetaDataSqlQuery)
-                .stream().map(DefaultFileMeta::new)
-                .collect(Collectors.toList());
+        return metas.stream().map(DefaultFileMeta::new).collect(Collectors.toList());
     }
 
     @Override
