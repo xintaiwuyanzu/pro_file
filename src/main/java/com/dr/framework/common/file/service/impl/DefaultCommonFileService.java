@@ -15,6 +15,7 @@ import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -375,14 +376,14 @@ public class DefaultCommonFileService extends AbstractCommonFileService implemen
     }
 
     @Override
-    public OutputStream fileStream(String fileId) throws IOException {
+    public InputStream fileStream(String fileId) throws IOException {
         FileInfo fileInfo = fileInfo(fileId);
         Assert.isTrue(fileInfo != null, "指定的文件不存在！");
         return fileSaveHandler.openStream(fileInfo);
     }
 
     @Override
-    public OutputStream fileStreamByHash(String hash) throws IOException {
+    public InputStream fileStreamByHash(String hash) throws IOException {
         BaseFile fileInfo = fileInfoByHash(hash);
         Assert.isTrue(fileInfo != null, "指定的文件不存在！");
         return fileSaveHandler.openStream(fileInfo);

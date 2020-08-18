@@ -7,7 +7,6 @@ import org.springframework.util.Assert;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
@@ -65,7 +64,7 @@ public class FileHandlerComposite implements FileSaveHandler {
     }
 
     @Override
-    public OutputStream openStream(BaseFile fileInfo) throws IOException {
+    public InputStream openStream(BaseFile fileInfo) throws IOException {
         for (FileSaveHandler handler : fileHandlers) {
             if (handler.canHandle(fileInfo)) {
                 return handler.openStream(fileInfo);

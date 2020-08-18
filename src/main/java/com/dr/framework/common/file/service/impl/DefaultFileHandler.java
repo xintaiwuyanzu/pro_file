@@ -91,9 +91,9 @@ public class DefaultFileHandler implements FileSaveHandler, InitializingBean {
     }
 
     @Override
-    public OutputStream openStream(BaseFile fileInfo) throws IOException {
+    public InputStream openStream(BaseFile fileInfo) throws IOException {
         String path = buildFilePath(fileInfo);
-        return new FileOutputStream(path);
+        return new FileInputStream(path);
     }
 
     @Override

@@ -55,7 +55,7 @@ public interface FileSaveHandler extends Ordered {
      * @param fileInfo
      * @return
      */
-    OutputStream openStream(BaseFile fileInfo) throws IOException;
+    InputStream openStream(BaseFile fileInfo) throws IOException;
 
     /**
      * 使用原生系统方法高效复制文件到指定的文件

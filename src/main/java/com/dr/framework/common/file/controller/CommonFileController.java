@@ -6,6 +6,8 @@ import com.dr.framework.common.file.model.FileInfo;
 import com.dr.framework.common.file.resource.MultipartFileResource;
 import com.dr.framework.common.file.service.CommonFileService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.core.io.InputStreamSource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -104,7 +106,7 @@ public class CommonFileController {
      * @return
      */
     @RequestMapping("/downLoad/{fileId}")
-    public ResponseEntity downLoad(@PathVariable(name = "fileId") String fileId) throws IOException {
+    public ResponseEntity<InputStreamSource> downLoad(@PathVariable(name = "fileId") String fileId) throws IOException {
         FileInfo fileInfo = fileService.fileInfo(fileId);
         Assert.isTrue(fileInfo != null, "指定的文件不存在");
         HttpHeaders headers = new HttpHeaders();
@@ -118,7 +120,7 @@ public class CommonFileController {
                 .headers(headers)
                 .contentLength(fileInfo.getFileSize())
                 .contentType(MediaType.parseMediaType(fileInfo.getMimeType()))
-                .body(fileService.fileStream(fileInfo.getId()));
+                .body(new InputStreamResource(fileService.fileStream(fileInfo.getId()), fileInfo.getDescription()));
     }
 
     /**

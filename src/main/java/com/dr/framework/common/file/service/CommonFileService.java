@@ -6,7 +6,7 @@ import com.dr.framework.common.file.model.FileInfo;
 import com.dr.framework.common.file.model.FileMeta;
 
 import java.io.IOException;
-import java.io.OutputStream;
+import java.io.InputStream;
 import java.util.List;
 
 /**
@@ -369,7 +369,7 @@ public interface CommonFileService {
      * @param fileId
      * @return
      */
-    OutputStream fileStream(String fileId) throws IOException;
+    InputStream fileStream(String fileId) throws IOException;
 
     /**
      * 根据Hash打开文件流
@@ -378,7 +378,7 @@ public interface CommonFileService {
      * @return
      * @throws IOException
      */
-    OutputStream fileStreamByHash(String hash) throws IOException;
+    InputStream fileStreamByHash(String hash) throws IOException;
 
     /**
      * 复制指定的文件到新文件
