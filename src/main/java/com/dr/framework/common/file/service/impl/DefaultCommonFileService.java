@@ -126,6 +126,8 @@ public class DefaultCommonFileService extends AbstractCommonFileService implemen
             fileBaseInfo = new FileBaseInfo();
             CommonService.bindCreateInfo(fileBaseInfo);
             fileBaseInfo.setFileHash(hash);
+            //TODO
+            fileBaseInfo.setHashMethod("sha512");
             fileBaseInfo.setFileSize(file.getFileSize());
             fileBaseInfo.setOriginCreateDate(file.getCreateDate());
             fileBaseInfo.setLastModifyDate(file.getLastModifyDate());

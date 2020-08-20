@@ -29,6 +29,11 @@ class FileBaseInfo extends BaseCreateInfoEntity {
      */
     @Column(comment = "文件hash", length = 200)
     private String fileHash;
+    /**
+     * TODO
+     */
+    @Column(comment = "hash编码类型", length = 100)
+    private String hashMethod;
 
     @Column(comment = "文件实际类型", length = 100)
     private String mimeType;
@@ -87,5 +92,13 @@ class FileBaseInfo extends BaseCreateInfoEntity {
 
     public void setMimeType(String mimeType) {
         this.mimeType = mimeType;
+    }
+
+    public String getHashMethod() {
+        return hashMethod;
+    }
+
+    public void setHashMethod(String hashMethod) {
+        this.hashMethod = hashMethod;
     }
 }
