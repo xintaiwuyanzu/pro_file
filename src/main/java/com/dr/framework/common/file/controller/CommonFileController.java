@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
@@ -115,12 +116,17 @@ public class CommonFileController {
         headers.add("Content-Disposition", String.format("attachment; filename=\"%s\"", new String(fileInfo.getName().getBytes(StandardCharsets.UTF_8), StandardCharsets.ISO_8859_1)));
         headers.add("Pragma", "no-cache");
         headers.add("Expires", "0");
-        return ResponseEntity
-                .ok()
-                .headers(headers)
-                .contentLength(fileInfo.getFileSize())
-                .contentType(MediaType.parseMediaType(fileInfo.getMimeType()))
-                .body(new InputStreamResource(fileService.fileStream(fileInfo.getId()), fileInfo.getDescription()));
+        InputStream stream = fileService.fileStream(fileInfo.getId());
+        try {
+            return ResponseEntity
+                    .ok()
+                    .headers(headers)
+                    .contentLength(fileInfo.getFileSize())
+                    .contentType(MediaType.parseMediaType(fileInfo.getMimeType()))
+                    .body(new InputStreamResource(stream, fileInfo.getDescription()));
+        } finally {
+            stream.close();
+        }
     }
 
     /**

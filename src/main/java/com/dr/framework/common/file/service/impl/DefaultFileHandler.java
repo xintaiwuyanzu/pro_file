@@ -32,6 +32,9 @@ public class DefaultFileHandler implements FileSaveHandler, InitializingBean {
      */
     protected ApplicationHome applicationHome;
 
+    private String root;
+    private File rootDir;
+
     @Override
     public boolean canHandle(BaseFile fileInfo) {
         return true;
@@ -53,12 +56,12 @@ public class DefaultFileHandler implements FileSaveHandler, InitializingBean {
         );
     }
 
+    protected File getRootDir() {
+        return rootDir;
+    }
+
     protected String getRoot() {
-        if (!StringUtils.isEmpty(fileConfig.getFileLocation())) {
-            return fileConfig.getFileLocation();
-        } else {
-            return applicationHome.getDir().getPath() + File.separator + fileConfig.getRootDirName();
-        }
+        return root;
     }
 
     @Override
@@ -68,7 +71,16 @@ public class DefaultFileHandler implements FileSaveHandler, InitializingBean {
         if (!sysFile.getParentFile().exists()) {
             sysFile.getParentFile().mkdirs();
         }
-        StreamUtils.copy(file.getInputStream(), new FileOutputStream(sysFile));
+        FileOutputStream outputStream = new FileOutputStream(sysFile);
+        InputStream inputStream = file.getInputStream();
+        try {
+            StreamUtils.copy(inputStream, outputStream);
+        } finally {
+            if (inputStream != null) {
+                inputStream.close();
+            }
+            outputStream.close();
+        }
     }
 
     @Override
@@ -87,14 +99,22 @@ public class DefaultFileHandler implements FileSaveHandler, InitializingBean {
         File sysFile = new File(path);
         if (sysFile.exists()) {
             sysFile.delete();
+            deleteEmptyDir(sysFile.getParentFile());
         }
     }
 
-    @Override
-    public InputStream openStream(BaseFile fileInfo) throws IOException {
-        String path = buildFilePath(fileInfo);
-        return new FileInputStream(path);
+    private void deleteEmptyDir(File parent) {
+        boolean con = parent != null && parent.exists() && parent.isDirectory();
+        String[] files = parent.list();
+        con = con && (files == null || files.length == 0);
+        if (con) {
+            parent.delete();
+            if (!parent.equals(new File(getRoot()))) {
+                deleteEmptyDir(parent.getParentFile());
+            }
+        }
     }
+
 
     @Override
     public boolean copyTo(BaseFile fileInfo, String newFile) throws IOException {
@@ -110,7 +130,14 @@ public class DefaultFileHandler implements FileSaveHandler, InitializingBean {
     }
 
     @Override
-    public void afterPropertiesSet() throws Exception {
+    public void afterPropertiesSet() {
         applicationHome = new ApplicationHome();
+        if (!StringUtils.isEmpty(fileConfig.getFileLocation())) {
+            root = fileConfig.getFileLocation();
+        } else {
+            root = applicationHome.getDir().getPath() + File.separator + fileConfig.getRootDirName();
+        }
+        rootDir = new File(root);
+        Assert.isTrue(rootDir.exists(), "上传附件文件夹不存在：" + root);
     }
 }

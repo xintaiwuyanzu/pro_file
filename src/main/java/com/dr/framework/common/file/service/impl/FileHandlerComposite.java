@@ -64,16 +64,6 @@ public class FileHandlerComposite implements FileSaveHandler {
     }
 
     @Override
-    public InputStream openStream(BaseFile fileInfo) throws IOException {
-        for (FileSaveHandler handler : fileHandlers) {
-            if (handler.canHandle(fileInfo)) {
-                return handler.openStream(fileInfo);
-            }
-        }
-        return null;
-    }
-
-    @Override
     public boolean copyTo(BaseFile fileInfo, String newFile) throws IOException {
         for (FileSaveHandler handler : fileHandlers) {
             if (handler.canHandle(fileInfo)) {

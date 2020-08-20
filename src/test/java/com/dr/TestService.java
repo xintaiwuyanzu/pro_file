@@ -9,9 +9,11 @@ import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.system.ApplicationHome;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
@@ -21,18 +23,25 @@ public class TestService {
     Logger logger = LoggerFactory.getLogger(TestService.class);
     @Autowired
     CommonFileService commonFileService;
+    ApplicationHome home = new ApplicationHome();
 
     @Test
     public void testAdd() throws IOException {
-        commonFileService.addFile(new FileSystemFileResource("d:/backup6.log", "aaa"), "aaa");
-        commonFileService.addFile(new FileSystemFileResource("d:/backup6.log", "bbb"), "aaa");
-        commonFileService.addFile(new FileSystemFileResource("d:/backup6.log", "ccc"), "aaa");
-        commonFileService.addFile(new FileSystemFileResource("d:/backup6.log", "ddd"), "aaa");
-        List<FileInfo> fileInfos = commonFileService.list("aaa");
+        File file = new File(home.getDir(), "pom.xml");
+        String refId = "refId";
+
+        commonFileService.addFile(new FileSystemFileResource(file, "aaa"), refId);
+        commonFileService.addFile(new FileSystemFileResource(file, "bbb"), refId);
+        commonFileService.addFile(new FileSystemFileResource(file, "ccc"), refId);
+        commonFileService.addFile(new FileSystemFileResource(file, "ddd"), refId);
+        List<FileInfo> fileInfos = commonFileService.list(refId);
         Assert.assertEquals(4, fileInfos.size());
         commonFileService.removeFile(fileInfos.get(2).getId());
-        fileInfos = commonFileService.list("aaa");
+
+        fileInfos = commonFileService.list(refId);
         Assert.assertEquals(3, fileInfos.size());
+
+        commonFileService.removeFileByRef(refId);
     }
 
 }

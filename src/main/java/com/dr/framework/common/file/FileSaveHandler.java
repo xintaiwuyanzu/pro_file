@@ -4,7 +4,6 @@ import org.springframework.core.Ordered;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 
 /**
  * 文件处理工具类
@@ -48,14 +47,6 @@ public interface FileSaveHandler extends Ordered {
      * @param fileInfo
      */
     void deleteFile(BaseFile fileInfo);
-
-    /**
-     * 打开输出文件流
-     *
-     * @param fileInfo
-     * @return
-     */
-    InputStream openStream(BaseFile fileInfo) throws IOException;
 
     /**
      * 使用原生系统方法高效复制文件到指定的文件

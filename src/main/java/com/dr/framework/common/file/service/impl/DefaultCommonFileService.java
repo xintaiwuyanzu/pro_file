@@ -16,7 +16,6 @@ import org.springframework.util.StringUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -26,8 +25,6 @@ import java.util.stream.Collectors;
  * @author dr
  */
 public class DefaultCommonFileService extends AbstractCommonFileService implements CommonFileService {
-    @Autowired
-    protected CommonFileMapper fileMapper;
     @Autowired
     protected CommonMetaService commonMetaService;
 
@@ -379,14 +376,14 @@ public class DefaultCommonFileService extends AbstractCommonFileService implemen
     public InputStream fileStream(String fileId) throws IOException {
         FileInfo fileInfo = fileInfo(fileId);
         Assert.isTrue(fileInfo != null, "指定的文件不存在！");
-        return fileSaveHandler.openStream(fileInfo);
+        return fileSaveHandler.readFile(fileInfo);
     }
 
     @Override
     public InputStream fileStreamByHash(String hash) throws IOException {
         BaseFile fileInfo = fileInfoByHash(hash);
         Assert.isTrue(fileInfo != null, "指定的文件不存在！");
-        return fileSaveHandler.openStream(fileInfo);
+        return fileSaveHandler.readFile(fileInfo);
     }
 
     @Override
@@ -491,10 +488,6 @@ public class DefaultCommonFileService extends AbstractCommonFileService implemen
     @Override
     @Transactional(rollbackFor = Exception.class)
     public long removeFileByRef(String refId, String refType, String groupCode) {
-        //先查出来count==1的数据
-        List<FileBaseInfo> baseInfos = fileMapper.needDeleteBaseFiles(refId, refType, groupCode);
-        String[] idArr = new String[baseInfos.size()];
-
         //删除关联表数据
         long count = commonMapper.deleteByQuery(
                 buildParamsQuery(SqlQuery.from(FileRelation.class)
@@ -503,13 +496,26 @@ public class DefaultCommonFileService extends AbstractCommonFileService implemen
                         groupCode
                 )
         );
-        //删除文件
-        for (int i = 0; i < baseInfos.size(); i++) {
-            FileBaseInfo baseInfo = baseInfos.get(i);
-            fileSaveHandler.deleteFile(new DefaultBaseFile(baseInfo));
-            idArr[i] = baseInfo.getId();
+        //不管啥情况，只要fileBaseInfo 中有的但是fileRelation 中没有的文件都要删除
+        //TODO 数据量到百万的时候有性能问题
+        List<FileBaseInfo> baseInfos = commonMapper.selectByQuery(
+                SqlQuery.from(FileBaseInfo.class)
+                        .notIn(
+                                FileBaseInfoInfo.ID, SqlQuery.from(FileRelation.class, false)
+                                        .column(FileRelationInfo.FILEID)
+                                        .groupBy(FileRelationInfo.FILEID)
+                        )
+        );
+        if (!baseInfos.isEmpty()) {
+            String[] idArr = new String[baseInfos.size()];
+            //删除文件
+            for (int i = 0; i < baseInfos.size(); i++) {
+                FileBaseInfo baseInfo = baseInfos.get(i);
+                fileSaveHandler.deleteFile(new DefaultBaseFile(baseInfo));
+                idArr[i] = baseInfo.getId();
+            }
+            count += commonMapper.deleteBatchIds(FileBaseInfo.class, idArr);
         }
-        count += commonMapper.deleteBatchIds(FileBaseInfo.class, idArr);
         return count;
     }
 
