@@ -138,6 +138,9 @@ public class DefaultFileHandler implements FileSaveHandler, InitializingBean {
             root = applicationHome.getDir().getPath() + File.separator + fileConfig.getRootDirName();
         }
         rootDir = new File(root);
-        Assert.isTrue(rootDir.exists(), "上传附件文件夹不存在：" + root);
+        if (!rootDir.exists()) {
+            boolean mkDirs = rootDir.mkdirs();
+            Assert.isTrue(mkDirs, "创建上传文件夹失败：" + mkDirs);
+        }
     }
 }

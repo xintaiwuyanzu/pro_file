@@ -29,13 +29,9 @@ public interface CommonFileService {
      * ===================================
      */
 
-    default FileInfo addFile(FileResource file, String refId) throws IOException {
-        return addFile(file, refId, DEFAULT_REF_TYPE);
-    }
+    FileInfo addFile(FileResource file, String refId) throws IOException;
 
-    default FileInfo addFile(FileResource file, String refId, String refType) throws IOException {
-        return addFile(file, refId, refType, DEFAULT_GROUP_CODE);
-    }
+    FileInfo addFile(FileResource file, String refId, String refType) throws IOException;
 
     /**
      * 添加附件，默认追加到最后一条
@@ -43,17 +39,11 @@ public interface CommonFileService {
      * @param file
      * @return
      */
-    default FileInfo addFile(FileResource file, String refId, String refType, String groupCode) throws IOException {
-        return addFileLast(file, refId, refType, groupCode);
-    }
+    FileInfo addFile(FileResource file, String refId, String refType, String groupCode) throws IOException;
 
-    default FileInfo addFile(String hash, String refId) {
-        return addFile(hash, refId, DEFAULT_REF_TYPE);
-    }
+    FileInfo addFile(String hash, String refId);
 
-    default FileInfo addFile(String hash, String refId, String refType) {
-        return addFile(hash, refId, refType, DEFAULT_GROUP_CODE);
-    }
+    FileInfo addFile(String hash, String refId, String refType);
 
     /**
      * 根据hash添加文件
@@ -64,17 +54,11 @@ public interface CommonFileService {
      * @param groupCode
      * @return
      */
-    default FileInfo addFile(String hash, String refId, String refType, String groupCode) {
-        return addFileLast(hash, refId, refType, groupCode);
-    }
+    FileInfo addFile(String hash, String refId, String refType, String groupCode);
 
-    default FileInfo addFileFirst(FileResource file, String refId) throws IOException {
-        return addFileFirst(file, refId, DEFAULT_REF_TYPE);
-    }
+    FileInfo addFileFirst(FileResource file, String refId) throws IOException;
 
-    default FileInfo addFileFirst(FileResource file, String refId, String refType) throws IOException {
-        return addFileFirst(file, refId, refType, DEFAULT_GROUP_CODE);
-    }
+    FileInfo addFileFirst(FileResource file, String refId, String refType) throws IOException;
 
     /**
      * 在指定业务类型的最前面插入数据
@@ -87,13 +71,9 @@ public interface CommonFileService {
      */
     FileInfo addFileFirst(FileResource file, String refId, String refType, String groupCode) throws IOException;
 
-    default FileInfo addFileFirst(String hash, String refId) {
-        return addFileFirst(hash, refId, DEFAULT_REF_TYPE);
-    }
+    FileInfo addFileFirst(String hash, String refId);
 
-    default FileInfo addFileFirst(String hash, String refId, String refType) {
-        return addFileFirst(hash, refId, refType, DEFAULT_GROUP_CODE);
-    }
+    FileInfo addFileFirst(String hash, String refId, String refType);
 
     /**
      * 在头部根据hash添加文件
@@ -106,13 +86,9 @@ public interface CommonFileService {
      */
     FileInfo addFileFirst(String hash, String refId, String refType, String groupCode);
 
-    default FileInfo addFileLast(FileResource file, String refId) throws IOException {
-        return addFileLast(file, refId, DEFAULT_REF_TYPE);
-    }
+    FileInfo addFileLast(FileResource file, String refId) throws IOException;
 
-    default FileInfo addFileLast(FileResource file, String refId, String refType) throws IOException {
-        return addFileLast(file, refId, refType, DEFAULT_GROUP_CODE);
-    }
+    FileInfo addFileLast(FileResource file, String refId, String refType) throws IOException;
 
     /**
      * 在指定业务类型的最侯面插入数据
@@ -125,13 +101,9 @@ public interface CommonFileService {
      */
     FileInfo addFileLast(FileResource file, String refId, String refType, String groupCode) throws IOException;
 
-    default FileInfo addFileLast(String hash, String refId) {
-        return addFileLast(hash, refId, DEFAULT_REF_TYPE);
-    }
+    FileInfo addFileLast(String hash, String refId);
 
-    default FileInfo addFileLast(String hash, String refId, String refType) {
-        return addFileLast(hash, refId, refType, DEFAULT_GROUP_CODE);
-    }
+    FileInfo addFileLast(String hash, String refId, String refType);
 
     /**
      * 根据hash在最后添加文件
@@ -250,13 +222,9 @@ public interface CommonFileService {
      * 查询
      * ===================================
      */
-    default FileInfo firstFile(String refId) {
-        return firstFile(refId, DEFAULT_REF_TYPE);
-    }
+    FileInfo firstFile(String refId);
 
-    default FileInfo firstFile(String refId, String refType) {
-        return firstFile(refId, refType, DEFAULT_GROUP_CODE);
-    }
+    FileInfo firstFile(String refId, String refType);
 
     /**
      * 根据条件查询第一个附件
@@ -268,13 +236,9 @@ public interface CommonFileService {
      */
     FileInfo firstFile(String refId, String refType, String groupCode);
 
-    default FileInfo lastFile(String refId) {
-        return firstFile(refId, DEFAULT_REF_TYPE);
-    }
+    FileInfo lastFile(String refId);
 
-    default FileInfo lastFile(String refId, String refType) {
-        return firstFile(refId, refType, DEFAULT_GROUP_CODE);
-    }
+    FileInfo lastFile(String refId, String refType);
 
     /**
      * 根据条件查询最后一个附件
@@ -332,9 +296,7 @@ public interface CommonFileService {
      * @param fileId 可以是基本文件Id，也可以是关联文件Id
      * @return
      */
-    default List<FileMeta> getFileMeta(String fileId) {
-        return getFileMeta(fileId, true);
-    }
+    List<FileMeta> getFileMeta(String fileId);
 
     /**
      * 获取指定文件的元数据
@@ -345,13 +307,9 @@ public interface CommonFileService {
      */
     List<FileMeta> getFileMeta(String fileId, boolean includeBaseFile);
 
-    default List<FileInfo> list(String refId) {
-        return list(refId, DEFAULT_REF_TYPE);
-    }
+    List<FileInfo> list(String refId);
 
-    default List<FileInfo> list(String refId, String refType) {
-        return list(refId, refType, DEFAULT_GROUP_CODE);
-    }
+    List<FileInfo> list(String refId, String refType);
 
     /**
      * 获取指定条件的附件列表
@@ -399,13 +357,9 @@ public interface CommonFileService {
      */
     boolean copyToByHash(String fileHash, String newFile) throws IOException;
 
-    default long count(String refId) {
-        return count(refId, DEFAULT_REF_TYPE);
-    }
+    long count(String refId);
 
-    default long count(String refId, String refType) {
-        return count(refId, refType, DEFAULT_GROUP_CODE);
-    }
+    long count(String refId, String refType);
 
     /**
      * 计数
@@ -417,13 +371,9 @@ public interface CommonFileService {
      */
     long count(String refId, String refType, String groupCode);
 
-    default long size(String refId) {
-        return size(refId, DEFAULT_REF_TYPE);
-    }
+    long size(String refId);
 
-    default long size(String refId, String refType) {
-        return size(refId, refType, DEFAULT_GROUP_CODE);
-    }
+    long size(String refId, String refType);
 
     /**
      * 计算附件大小
@@ -448,13 +398,9 @@ public interface CommonFileService {
      */
     long removeFile(String fileId);
 
-    default long removeFileByRef(String refId) {
-        return removeFileByRef(refId, DEFAULT_REF_TYPE);
-    }
+    long removeFileByRef(String refId);
 
-    default long removeFileByRef(String refId, String refType) {
-        return removeFileByRef(refId, refType, DEFAULT_GROUP_CODE);
-    }
+    long removeFileByRef(String refId, String refType);
 
     /**
      * 根据业务外键，业务类型，分组删除所有附件

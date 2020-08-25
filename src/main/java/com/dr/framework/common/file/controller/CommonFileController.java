@@ -107,13 +107,18 @@ public class CommonFileController {
      * @return
      */
     @RequestMapping("/downLoad/{fileId}")
-    public ResponseEntity<InputStreamSource> downLoad(@PathVariable(name = "fileId") String fileId) throws IOException {
+    public ResponseEntity<InputStreamSource> downLoad(
+            @PathVariable(name = "fileId") String fileId,
+            @RequestParam(defaultValue = "true", name = "download") boolean download
+    ) throws IOException {
         FileInfo fileInfo = fileService.fileInfo(fileId);
         Assert.isTrue(fileInfo != null, "指定的文件不存在");
         HttpHeaders headers = new HttpHeaders();
         //TODO 缓存头
         headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
-        headers.add("Content-Disposition", String.format("attachment; filename=\"%s\"", new String(fileInfo.getName().getBytes(StandardCharsets.UTF_8), StandardCharsets.ISO_8859_1)));
+        if (download) {
+            headers.add("Content-Disposition", String.format("attachment; filename=\"%s\"", new String(fileInfo.getName().getBytes(StandardCharsets.UTF_8), StandardCharsets.ISO_8859_1)));
+        }
         headers.add("Pragma", "no-cache");
         headers.add("Expires", "0");
         InputStream stream = fileService.fileStream(fileInfo.getId());

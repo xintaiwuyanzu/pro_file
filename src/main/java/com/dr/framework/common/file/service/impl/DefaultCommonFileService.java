@@ -6,7 +6,6 @@ import com.dr.framework.common.file.BaseFile;
 import com.dr.framework.common.file.FileResource;
 import com.dr.framework.common.file.model.FileInfo;
 import com.dr.framework.common.file.model.FileMeta;
-import com.dr.framework.common.file.service.CommonFileService;
 import com.dr.framework.common.service.CommonService;
 import com.dr.framework.core.orm.sql.support.SqlQuery;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +23,7 @@ import java.util.stream.Collectors;
  *
  * @author dr
  */
-public class DefaultCommonFileService extends AbstractCommonFileService implements CommonFileService {
+public class DefaultCommonFileService extends AbstractCommonFileService {
     @Autowired
     protected CommonMetaService commonMetaService;
 

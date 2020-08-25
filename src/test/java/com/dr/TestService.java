@@ -3,6 +3,7 @@ package com.dr;
 import com.dr.framework.common.file.model.FileInfo;
 import com.dr.framework.common.file.resource.FileSystemFileResource;
 import com.dr.framework.common.file.service.CommonFileService;
+import com.dr.framework.core.security.SecurityHolder;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -15,6 +16,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 
 @SpringBootTest(classes = TestApplication.class)
@@ -26,14 +28,22 @@ public class TestService {
     ApplicationHome home = new ApplicationHome();
 
     @Test
-    public void testAdd() throws IOException {
+    public void testAdd() {
         File file = new File(home.getDir(), "pom.xml");
         String refId = "refId";
-
-        commonFileService.addFile(new FileSystemFileResource(file, "aaa"), refId);
-        commonFileService.addFile(new FileSystemFileResource(file, "bbb"), refId);
-        commonFileService.addFile(new FileSystemFileResource(file, "ccc"), refId);
-        commonFileService.addFile(new FileSystemFileResource(file, "ddd"), refId);
+        SecurityHolder securityHolder = SecurityHolder.get();
+        Arrays.asList("aaa", "bbb", "ccc", "ddd")
+                .parallelStream()
+                .forEach(c ->
+                        {
+                            SecurityHolder.set(securityHolder);
+                            try {
+                                commonFileService.addFile(new FileSystemFileResource(file, c), refId);
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                );
         List<FileInfo> fileInfos = commonFileService.list(refId);
         Assert.assertEquals(4, fileInfos.size());
         commonFileService.removeFile(fileInfos.get(2).getId());

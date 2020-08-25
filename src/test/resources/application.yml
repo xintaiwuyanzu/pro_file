@@ -7,5 +7,5 @@ spring:
     autoDDl: update
 logging:
   level:
-    com.dr.framework.common: debug
+    com.dr.framework.*: debug
 
