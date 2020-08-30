@@ -158,7 +158,7 @@ public class CommonFileController {
      * @throws IOException
      */
     @PostMapping("/delete/{fileId}")
-    public ResultEntity<Long> delete(@PathVariable(name = "fileId") String fileId) throws IOException {
+    public ResultEntity<Long> delete(@PathVariable(name = "fileId") String fileId) {
         return ResultEntity.success(fileService.removeFile(fileId));
     }
 }

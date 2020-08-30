@@ -296,6 +296,7 @@ abstract class AbstractCommonFileService implements CommonFileService, Initializ
                         FileBaseInfoInfo.FILESIZE,
                         FileBaseInfoInfo.FILEHASH,
                         FileBaseInfoInfo.MIMETYPE,
+                        FileBaseInfoInfo.CREATEDATE.alias("saveDate"),
 
                         FileRelationInfo.ID,
                         FileRelationInfo.NEXTID,
@@ -303,8 +304,7 @@ abstract class AbstractCommonFileService implements CommonFileService, Initializ
                         FileRelationInfo.REFID,
                         FileRelationInfo.REFTYPE,
                         FileRelationInfo.GROUPCODE,
-                        FileRelationInfo.DESCRIPTION,
-                        FileRelationInfo.CREATEDATE.alias("saveDate")
+                        FileRelationInfo.DESCRIPTION
                 )
                 .join(FileRelationInfo.FILEID, FileBaseInfoInfo.ID)
                 .setReturnClass(DefaultFileInfo.class);
