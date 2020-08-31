@@ -122,16 +122,12 @@ public class CommonFileController {
         headers.add("Pragma", "no-cache");
         headers.add("Expires", "0");
         InputStream stream = fileService.fileStream(fileInfo.getId());
-        try {
-            return ResponseEntity
-                    .ok()
-                    .headers(headers)
-                    .contentLength(fileInfo.getFileSize())
-                    .contentType(MediaType.parseMediaType(fileInfo.getMimeType()))
-                    .body(new InputStreamResource(stream, fileInfo.getDescription()));
-        } finally {
-            stream.close();
-        }
+        return ResponseEntity
+                .ok()
+                .headers(headers)
+                .contentLength(fileInfo.getFileSize())
+                .contentType(MediaType.parseMediaType(fileInfo.getMimeType()))
+                .body(new InputStreamResource(stream, fileInfo.getDescription()));
     }
 
     /**
