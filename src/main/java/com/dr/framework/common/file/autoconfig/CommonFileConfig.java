@@ -198,7 +198,7 @@ public class CommonFileConfig implements InitializingBean, WebMvcConfigurer {
         Assert.isTrue(Files.isRegularFile(fp), "文件路径格式不正确！");
         String uploadDir = getUploadDir(null);
         Path dirPath = Paths.get(uploadDir);
-        return "/" + uploadDir + "/" + dirPath.relativize(fp).toString().replace(File.separator, "/");
+        return "/" + uploadDirName + "/" + dirPath.relativize(fp).toString().replace(File.separator, "/");
     }
 
     public String uploadFile(String dir, InputStream fis, String fileName) throws IOException {
@@ -251,7 +251,7 @@ public class CommonFileConfig implements InitializingBean, WebMvcConfigurer {
      */
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        registry.addResourceHandler(uploadDirName + "/**")
-                .addResourceLocations(getUploadDir(null));
+        registry.addResourceHandler("/" + uploadDirName + "/**")
+                .addResourceLocations("file:" + getUploadDir(null) + File.separator);
     }
 }
