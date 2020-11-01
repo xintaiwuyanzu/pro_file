@@ -4,10 +4,8 @@ import com.dr.framework.common.file.BaseFile;
 import com.dr.framework.common.file.FileResource;
 import com.dr.framework.common.file.FileSaveHandler;
 import com.dr.framework.common.file.autoconfig.CommonFileConfig;
-import org.apache.commons.lang3.time.DateFormatUtils;
-import org.springframework.beans.factory.InitializingBean;
+import com.dr.framework.core.util.Constants;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.system.ApplicationHome;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 import org.springframework.util.StreamUtils;
@@ -24,16 +22,9 @@ import java.util.Date;
  * @author dr
  */
 @Component
-public class DefaultFileHandler implements FileSaveHandler, InitializingBean {
+public class DefaultFileHandler implements FileSaveHandler {
     @Autowired
     protected CommonFileConfig fileConfig;
-    /**
-     * 默认获取jar包所在位置
-     */
-    protected ApplicationHome applicationHome;
-
-    private String root;
-    private File rootDir;
 
     @Override
     public boolean canHandle(BaseFile fileInfo) {
@@ -42,26 +33,12 @@ public class DefaultFileHandler implements FileSaveHandler, InitializingBean {
 
     protected String buildFilePath(BaseFile fileInfo) {
         Date date = new Date(fileInfo.getSaveDate());
+        String mineType = StringUtils.isEmpty(fileInfo.getSuffix()) ? Constants.DEFAULT : fileInfo.getSuffix();
         return String.join(
                 File.separator,
-                getRoot(),
-                //文件类型
-                StringUtils.isEmpty(fileInfo.getSuffix()) ? "default" : fileInfo.getSuffix(),
-                //年月日
-                DateFormatUtils.format(date, "yyyy"),
-                DateFormatUtils.format(date, "MM"),
-                DateFormatUtils.format(date, "dd"),
-                //文件名称
+                fileConfig.getFullDirPath(null, mineType, date),
                 fileInfo.getBaseFileId() + "." + fileInfo.getSuffix()
         );
-    }
-
-    protected File getRootDir() {
-        return rootDir;
-    }
-
-    protected String getRoot() {
-        return root;
     }
 
     @Override
@@ -109,7 +86,7 @@ public class DefaultFileHandler implements FileSaveHandler, InitializingBean {
         con = con && (files == null || files.length == 0);
         if (con) {
             parent.delete();
-            if (!parent.equals(new File(getRoot()))) {
+            if (!parent.equals(new File(fileConfig.getRootDirName()))) {
                 deleteEmptyDir(parent.getParentFile());
             }
         }
@@ -127,20 +104,5 @@ public class DefaultFileHandler implements FileSaveHandler, InitializingBean {
         }
         Files.copy(Paths.get(path), Paths.get(newFile));
         return true;
-    }
-
-    @Override
-    public void afterPropertiesSet() {
-        applicationHome = new ApplicationHome();
-        if (!StringUtils.isEmpty(fileConfig.getFileLocation())) {
-            root = fileConfig.getFileLocation();
-        } else {
-            root = applicationHome.getDir().getPath() + File.separator + fileConfig.getRootDirName();
-        }
-        rootDir = new File(root);
-        if (!rootDir.exists()) {
-            boolean mkDirs = rootDir.mkdirs();
-            Assert.isTrue(mkDirs, "创建上传文件夹失败：" + mkDirs);
-        }
     }
 }
