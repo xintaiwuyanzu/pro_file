@@ -1,6 +1,10 @@
-#提升最大上传大小为200m
-spring:
-  servlet:
-    multipart:
-      max-file-size: 200MB
-      max-request-size: 200MB
+server:
+  max-http-header-size: ${spring.servlet.multipart.max-file-size}
+  #开启gzip压缩，提高首页启动速度
+  compression:
+    enabled: true
+  tomcat:
+    max-http-form-post-size: ${spring.servlet.multipart.max-file-size}
+common:
+  file:
+    max-upload-size: ${spring.servlet.multipart.max-file-size}
