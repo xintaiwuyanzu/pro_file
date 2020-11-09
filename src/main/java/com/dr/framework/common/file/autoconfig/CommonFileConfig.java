@@ -156,7 +156,7 @@ public class CommonFileConfig implements InitializingBean, WebMvcConfigurer {
             //年月日
             paths.add(DateFormatUtils.format(date, "yyyy"));
             paths.add(DateFormatUtils.format(date, "MM"));
-            paths.add(DateFormatUtils.format(date, "MM"));
+            paths.add(DateFormatUtils.format(date, "dd"));
         }
         String fullPath = String.join(File.separator, paths);
         File file = new File(fullPath);
