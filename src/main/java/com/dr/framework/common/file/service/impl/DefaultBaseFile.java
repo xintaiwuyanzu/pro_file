@@ -16,7 +16,8 @@ class DefaultBaseFile implements BaseFile {
     private long lastModifyDate;
     private long saveDate;
     private long fileSize;
-
+    private String fileType;
+    private String fileAttr;
 
     public DefaultBaseFile() {
     }
@@ -29,6 +30,8 @@ class DefaultBaseFile implements BaseFile {
         setCreateDate(info.getOriginCreateDate());
         setLastModifyDate(info.getLastModifyDate());
         setFileSize(info.getFileSize());
+        setFileAttr(info.getFileAttr());
+        setFileType(info.getFileType());
     }
 
     @Override
@@ -92,5 +95,23 @@ class DefaultBaseFile implements BaseFile {
 
     public void setFileSize(long fileSize) {
         this.fileSize = fileSize;
+    }
+
+    @Override
+    public String getFileType() {
+        return fileType;
+    }
+
+    public void setFileType(String fileType) {
+        this.fileType = fileType;
+    }
+
+    @Override
+    public String getFileAttr() {
+        return fileAttr;
+    }
+
+    public void setFileAttr(String fileAttr) {
+        this.fileAttr = fileAttr;
     }
 }

@@ -55,4 +55,19 @@ public interface BaseFile {
      * @return
      */
     long getFileSize();
+
+    /**
+     * 获取文件类型
+     *
+     * @return
+     */
+    String getFileType();
+
+    /**
+     * 获取文件额外的信息
+     *
+     * @return
+     */
+    String getFileAttr();
+
 }

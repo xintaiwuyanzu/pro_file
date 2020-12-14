@@ -16,6 +16,8 @@ import java.io.InputStream;
 public class FileSystemFileResource implements FileResource {
     private final File file;
     private final String description;
+    private String fileType;
+    private String fileAttr;
 
     public FileSystemFileResource(String filePath) {
         this(new File(filePath), null);
@@ -64,5 +66,23 @@ public class FileSystemFileResource implements FileResource {
     @Override
     public long getFileSize() {
         return file.length();
+    }
+
+    @Override
+    public String getFileType() {
+        return fileType;
+    }
+
+    public void setFileType(String fileType) {
+        this.fileType = fileType;
+    }
+
+    @Override
+    public String getFileAttr() {
+        return fileAttr;
+    }
+
+    public void setFileAttr(String fileAttr) {
+        this.fileAttr = fileAttr;
     }
 }

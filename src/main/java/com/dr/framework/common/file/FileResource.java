@@ -79,5 +79,21 @@ public interface FileResource {
      */
     InputStream getInputStream() throws IOException;
 
+    /**
+     * 获取文件业务类型
+     *
+     * @return
+     */
+    default String getFileType() {
+        return "";
+    }
 
+    /**
+     * 获取文件额外的信息
+     *
+     * @return
+     */
+    default String getFileAttr() {
+        return "";
+    }
 }

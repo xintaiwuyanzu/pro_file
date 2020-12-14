@@ -15,7 +15,10 @@ import org.springframework.util.StringUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -26,6 +29,8 @@ import java.util.stream.Collectors;
 public class DefaultCommonFileService extends AbstractCommonFileService {
     @Autowired
     protected CommonMetaService commonMetaService;
+
+    final Map<String, FileBaseInfo> fileHashMap = Collections.synchronizedMap(new HashMap<>());
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -122,21 +127,32 @@ public class DefaultCommonFileService extends AbstractCommonFileService {
         //先查询相同hash的文件是否存在
         FileBaseInfo fileBaseInfo = baseInfoByHash(hash);
         if (fileBaseInfo == null) {
-            fileBaseInfo = new FileBaseInfo();
-            CommonService.bindCreateInfo(fileBaseInfo);
-            fileBaseInfo.setFileHash(hash);
-            //TODO
-            fileBaseInfo.setHashMethod("sha512");
-            fileBaseInfo.setFileSize(file.getFileSize());
-            fileBaseInfo.setOriginCreateDate(file.getCreateDate());
-            fileBaseInfo.setLastModifyDate(file.getLastModifyDate());
-            fileBaseInfo.setSuffix(file.getSuffix());
-            fileBaseInfo.setOriginName(file.getName());
-            fileBaseInfo.setMimeType(fileInfoHandler.fileMine(file));
-
+            synchronized (fileHashMap) {
+                fileBaseInfo = fileHashMap.get(hash);
+                if (fileBaseInfo == null) {
+                    fileBaseInfo = new FileBaseInfo();
+                    CommonService.bindCreateInfo(fileBaseInfo);
+                    fileBaseInfo.setFileHash(hash);
+                    //TODO
+                    fileBaseInfo.setHashMethod("sha512");
+                    fileBaseInfo.setFileSize(file.getFileSize());
+                    fileBaseInfo.setOriginCreateDate(file.getCreateDate());
+                    fileBaseInfo.setLastModifyDate(file.getLastModifyDate());
+                    fileBaseInfo.setSuffix(file.getSuffix());
+                    fileBaseInfo.setOriginName(file.getName());
+                    fileBaseInfo.setFileType(file.getFileType());
+                    fileBaseInfo.setFileAttr(file.getFileAttr());
+                    fileBaseInfo.setMimeType(fileInfoHandler.fileMine(file));
+                    fileHashMap.put(hash, fileBaseInfo);
+                } else {
+                    return fileBaseInfo;
+                }
+            }
             //如果是新文件，保存文件流，插入基本信息数据
             fileSaveHandler.writeFile(file, new DefaultBaseFile(fileBaseInfo));
             commonMapper.insert(fileBaseInfo);
+            //文件创建成功，从数据库就能查到相同的hash了，删除缓存
+            fileHashMap.remove(hash);
         }
         return fileBaseInfo;
     }

@@ -20,18 +20,7 @@
     <dependencies>
         <dependency>
             <groupId>com.dr</groupId>
-            <artifactId>orm</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.dr</groupId>
             <artifactId>framework</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.dr</groupId>
-            <artifactId>codegen</artifactId>
-            <scope>provided</scope>
             <optional>true</optional>
         </dependency>
         <dependency>

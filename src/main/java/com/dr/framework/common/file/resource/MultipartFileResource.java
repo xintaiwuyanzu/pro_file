@@ -14,10 +14,18 @@ import java.io.InputStream;
  */
 public class MultipartFileResource implements FileResource {
     private final MultipartFile multipartFile;
+    private String fileType;
+    private String fileAttr;
 
     public MultipartFileResource(MultipartFile multipartFile) {
         Assert.isTrue(multipartFile != null, "上传附件不能为空！");
         this.multipartFile = multipartFile;
+    }
+
+    public MultipartFileResource(MultipartFile multipartFile, String fileType, String fileAttr) {
+        this(multipartFile);
+        this.fileType = fileType;
+        this.fileAttr = fileAttr;
     }
 
     @Override
@@ -48,5 +56,15 @@ public class MultipartFileResource implements FileResource {
     @Override
     public InputStream getInputStream() throws IOException {
         return multipartFile.getInputStream();
+    }
+
+    @Override
+    public String getFileAttr() {
+        return fileAttr;
+    }
+
+    @Override
+    public String getFileType() {
+        return fileType;
     }
 }

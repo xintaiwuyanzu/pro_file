@@ -297,6 +297,8 @@ abstract class AbstractCommonFileService implements CommonFileService, Initializ
                         FileBaseInfoInfo.FILEHASH,
                         FileBaseInfoInfo.MIMETYPE,
                         FileBaseInfoInfo.CREATEDATE.alias("saveDate"),
+                        FileBaseInfoInfo.FILETYPE,
+                        FileBaseInfoInfo.FILEATTR,
 
                         FileRelationInfo.ID,
                         FileRelationInfo.NEXTID,

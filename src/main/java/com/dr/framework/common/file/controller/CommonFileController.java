@@ -1,23 +1,20 @@
 package com.dr.framework.common.file.controller;
 
 import com.dr.framework.common.entity.ResultEntity;
+import com.dr.framework.common.file.FileDownLoadHandler;
+import com.dr.framework.common.file.FileResource;
 import com.dr.framework.common.file.autoconfig.CommonFileConfig;
 import com.dr.framework.common.file.model.FileInfo;
 import com.dr.framework.common.file.resource.MultipartFileResource;
 import com.dr.framework.common.file.service.CommonFileService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.InputStreamResource;
-import org.springframework.core.io.InputStreamSource;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,6 +31,8 @@ public class CommonFileController {
     protected CommonFileService fileService;
     @Autowired
     protected CommonFileConfig fileConfig;
+    @Autowired
+    protected List<FileDownLoadHandler> fileDownLoadHandlers;
 
     /**
      * 上传文件
@@ -45,15 +44,18 @@ public class CommonFileController {
      * @return
      */
     @PostMapping("/upload")
-    public ResultEntity upload(@RequestParam("file") MultipartFile[] files,
+    public ResultEntity upload(@RequestParam(name = "file") MultipartFile[] files,
                                @RequestParam(name = "refId") String refId,
                                @RequestParam(name = "refType", defaultValue = CommonFileService.DEFAULT_REF_TYPE) String refType,
-                               @RequestParam(name = "groupCode", defaultValue = CommonFileService.DEFAULT_GROUP_CODE) String groupCode) {
+                               @RequestParam(name = "groupCode", defaultValue = CommonFileService.DEFAULT_GROUP_CODE) String groupCode,
+                               @RequestParam(name = "fileType", required = false) String fileType,
+                               @RequestParam(name = "fileAttr", required = false) String fileAttr) {
         List<FileInfo> fileInfos = new ArrayList<>();
         for (MultipartFile file : files) {
             if (file != null) {
                 try {
-                    fileInfos.add(fileService.addFile(new MultipartFileResource(file), refId, refType, groupCode));
+                    FileResource fileResource = new MultipartFileResource(file, fileType, fileAttr);
+                    fileInfos.add(fileService.addFile(fileResource, refId, refType, groupCode));
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -107,27 +109,20 @@ public class CommonFileController {
      * @return
      */
     @RequestMapping("/downLoad/{fileId}")
-    public ResponseEntity<InputStreamSource> downLoad(
+    public void downLoad(
             @PathVariable(name = "fileId") String fileId,
-            @RequestParam(defaultValue = "true", name = "download") boolean download
-    ) throws IOException {
+            @RequestParam(defaultValue = "true", name = "download") boolean download,
+            HttpServletRequest request,
+            HttpServletResponse response
+    ) {
         FileInfo fileInfo = fileService.fileInfo(fileId);
         Assert.isTrue(fileInfo != null, "指定的文件不存在");
-        HttpHeaders headers = new HttpHeaders();
-        //TODO 缓存头
-        headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
-        if (download) {
-            headers.add("Content-Disposition", String.format("attachment; filename=\"%s\"", new String(fileInfo.getName().getBytes(StandardCharsets.UTF_8), StandardCharsets.ISO_8859_1)));
+        for (FileDownLoadHandler handler : fileDownLoadHandlers) {
+            if (handler.canHandle(fileInfo)) {
+                handler.downLoadFile(fileInfo, download, request, response);
+                return;
+            }
         }
-        headers.add("Pragma", "no-cache");
-        headers.add("Expires", "0");
-        InputStream stream = fileService.fileStream(fileInfo.getId());
-        return ResponseEntity
-                .ok()
-                .headers(headers)
-                .contentLength(fileInfo.getFileSize())
-                .contentType(MediaType.parseMediaType(fileInfo.getMimeType()))
-                .body(new InputStreamResource(stream, fileInfo.getDescription()));
     }
 
     /**

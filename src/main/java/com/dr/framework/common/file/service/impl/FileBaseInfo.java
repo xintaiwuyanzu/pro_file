@@ -37,6 +37,10 @@ class FileBaseInfo extends BaseCreateInfoEntity {
 
     @Column(comment = "文件实际类型", length = 100)
     private String mimeType;
+    @Column(comment = "文件业务类型", length = 200)
+    private String fileType;
+    @Column(comment = "文件额外的信息", length = 800)
+    private String fileAttr;
 
     public String getOriginName() {
         return originName;
@@ -100,5 +104,21 @@ class FileBaseInfo extends BaseCreateInfoEntity {
 
     public void setHashMethod(String hashMethod) {
         this.hashMethod = hashMethod;
+    }
+
+    public String getFileType() {
+        return fileType;
+    }
+
+    public void setFileType(String fileType) {
+        this.fileType = fileType;
+    }
+
+    public String getFileAttr() {
+        return fileAttr;
+    }
+
+    public void setFileAttr(String fileAttr) {
+        this.fileAttr = fileAttr;
     }
 }
