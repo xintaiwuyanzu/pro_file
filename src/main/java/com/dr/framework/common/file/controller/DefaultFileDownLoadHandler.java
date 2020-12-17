@@ -1,9 +1,12 @@
 package com.dr.framework.common.file.controller;
 
 import com.dr.framework.common.file.FileDownLoadHandler;
+import com.dr.framework.common.file.FileSaveHandler;
 import com.dr.framework.common.file.model.FileInfo;
-import com.dr.framework.common.file.service.CommonFileService;
+import com.dr.framework.common.file.service.impl.FileHandlerComposite;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.availability.ApplicationAvailabilityBean;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
@@ -14,6 +17,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 
 /**
  * 默认的文件下载处理器
@@ -21,9 +25,8 @@ import java.nio.charset.StandardCharsets;
  * @author dr
  */
 @Component
-public class DefaultFileDownLoadHandler implements FileDownLoadHandler {
-    @Autowired
-    CommonFileService fileService;
+public class DefaultFileDownLoadHandler extends ApplicationAvailabilityBean implements FileDownLoadHandler, InitializingBean {
+    FileSaveHandler fileSaveHandler;
 
     @Override
     public void downLoadFile(FileInfo fileInfo, boolean download, HttpServletRequest request, HttpServletResponse response) {
@@ -42,7 +45,7 @@ public class DefaultFileDownLoadHandler implements FileDownLoadHandler {
         } catch (Exception e) {
 
         }
-        try (InputStream inputStream = fileService.fileStream(fileInfo.getId())) {
+        try (InputStream inputStream = fileSaveHandler.readFile(fileInfo)) {
             StreamUtils.copy(inputStream, response.getOutputStream());
         } catch (IOException e) {
             e.printStackTrace();
@@ -57,5 +60,13 @@ public class DefaultFileDownLoadHandler implements FileDownLoadHandler {
     @Override
     public int getOrder() {
         return LOWEST_PRECEDENCE;
+    }
+
+    @Autowired
+    List<FileSaveHandler> fileSaveHandlerList;
+
+    @Override
+    public void afterPropertiesSet() {
+        fileSaveHandler = new FileHandlerComposite(fileSaveHandlerList);
     }
 }

@@ -3,6 +3,7 @@ package com.dr.framework.common.file.service.impl;
 import com.dr.framework.common.entity.BaseCreateInfoEntity;
 import com.dr.framework.core.orm.annotations.Column;
 import com.dr.framework.core.orm.annotations.ColumnType;
+import com.dr.framework.core.orm.annotations.Index;
 import com.dr.framework.core.orm.annotations.Table;
 import com.dr.framework.util.Constants;
 
@@ -27,6 +28,7 @@ class FileBaseInfo extends BaseCreateInfoEntity {
     /**
      * 相同hash文件不重复存储
      */
+    @Index
     @Column(comment = "文件hash", length = 200)
     private String fileHash;
     /**

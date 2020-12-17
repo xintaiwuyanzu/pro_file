@@ -2,6 +2,7 @@ package com.dr.framework.common.file.service.impl;
 
 import com.dr.framework.common.entity.BaseCreateInfoEntity;
 import com.dr.framework.core.orm.annotations.Column;
+import com.dr.framework.core.orm.annotations.Index;
 import com.dr.framework.core.orm.annotations.Table;
 import com.dr.framework.util.Constants;
 
@@ -17,6 +18,7 @@ class FileRelation extends BaseCreateInfoEntity {
     /**
      * 关联文件ID
      */
+    @Index
     @Column(length = 100)
     private String fileId;
 
@@ -27,6 +29,7 @@ class FileRelation extends BaseCreateInfoEntity {
      * 文件关联信息
      * =========================
      */
+    @Index
     @Column(comment = "业务外键", length = 100)
     private String refId;
     /**
@@ -35,11 +38,13 @@ class FileRelation extends BaseCreateInfoEntity {
      * <p>
      * 比如，档案、文书、图书等等，多条数据的外键类型可以相同
      */
+    @Index
     @Column(comment = "外键类型", length = 200)
     private String refType;
     /**
      * 同一个业务外键可能有多组附件，可以根据分组代码分别展示
      */
+    @Index
     @Column(comment = "分组代码", length = 200)
     private String groupCode;
     /*
@@ -50,6 +55,7 @@ class FileRelation extends BaseCreateInfoEntity {
     /**
      * 最后一个附件的下一个Id为null
      */
+
     @Column(comment = "后一个附件Id", length = 100)
     private String preId;
 

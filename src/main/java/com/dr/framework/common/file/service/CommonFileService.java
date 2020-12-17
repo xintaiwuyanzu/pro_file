@@ -326,6 +326,7 @@ public interface CommonFileService {
      *
      * @param fileId
      * @return
+     * @throws IOException
      */
     InputStream fileStream(String fileId) throws IOException;
 
@@ -344,6 +345,7 @@ public interface CommonFileService {
      * @param fileId
      * @param newFile
      * @return
+     * @throws IOException
      */
     boolean copyTo(String fileId, String newFile) throws IOException;
 
@@ -357,8 +359,21 @@ public interface CommonFileService {
      */
     boolean copyToByHash(String fileHash, String newFile) throws IOException;
 
+    /**
+     * 根据业务外键计算文件数量
+     *
+     * @param refId
+     * @return
+     */
     long count(String refId);
 
+    /**
+     * 根据业务外键和类型计算数量
+     *
+     * @param refId
+     * @param refType
+     * @return
+     */
     long count(String refId, String refType);
 
     /**
@@ -371,8 +386,21 @@ public interface CommonFileService {
      */
     long count(String refId, String refType, String groupCode);
 
+    /**
+     * 计算附件大小
+     *
+     * @param refId
+     * @return
+     */
     long size(String refId);
 
+    /**
+     * 计算附件大小
+     *
+     * @param refId
+     * @param refType
+     * @return
+     */
     long size(String refId, String refType);
 
     /**
@@ -395,11 +423,25 @@ public interface CommonFileService {
      * 根据文件Id删除文件
      *
      * @param fileId
+     * @return
      */
     long removeFile(String fileId);
 
+    /**
+     * 根据文件外键Id删除文件
+     *
+     * @param refId
+     * @return
+     */
     long removeFileByRef(String refId);
 
+    /**
+     * 根据文件外键Id删除文件
+     *
+     * @param refId
+     * @param refType
+     * @return
+     */
     long removeFileByRef(String refId, String refType);
 
     /**
