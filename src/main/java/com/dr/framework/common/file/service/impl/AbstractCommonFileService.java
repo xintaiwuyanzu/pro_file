@@ -11,11 +11,7 @@ import com.dr.framework.core.orm.sql.support.SqlQuery;
 import com.dr.framework.core.security.SecurityHolder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
@@ -28,14 +24,13 @@ import java.util.*;
  * <p>
  * 子类只处理逻辑
  */
-abstract class AbstractCommonFileService implements CommonFileService, InitializingBean, ApplicationContextAware {
+abstract class AbstractCommonFileService implements CommonFileService {
     protected static Logger logger = LoggerFactory.getLogger(CommonFileService.class);
     @Autowired
     protected CommonMapper commonMapper;
     @Autowired
-    protected ApplicationContext applicationContext;
-    @Autowired
     protected FileInfoHandler fileInfoHandler;
+    @Autowired
     protected FileSaveHandler fileSaveHandler;
 
     @Override
@@ -376,18 +371,5 @@ abstract class AbstractCommonFileService implements CommonFileService, Initializ
             return securityHolder.currentPerson().getId();
         }
         return null;
-    }
-
-    @Override
-    public void afterPropertiesSet() {
-        fileSaveHandler = new FileHandlerComposite(
-                applicationContext.getBeansOfType(FileSaveHandler.class)
-                        .values()
-        );
-    }
-
-    @Override
-    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-        this.applicationContext = applicationContext;
     }
 }

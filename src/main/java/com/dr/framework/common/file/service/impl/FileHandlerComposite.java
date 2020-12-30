@@ -73,4 +73,8 @@ public class FileHandlerComposite implements FileSaveHandler {
         return false;
     }
 
+    @Override
+    public int getOrder() {
+        return 0;
+    }
 }
