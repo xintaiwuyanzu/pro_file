@@ -33,7 +33,7 @@ public class TestService {
         String refId = "refId";
         SecurityHolder securityHolder = SecurityHolder.get();
         Arrays.asList("aaa", "bbb", "ccc", "ddd")
-                .parallelStream()
+                //.parallelStream()
                 .forEach(c ->
                         {
                             SecurityHolder.set(securityHolder);

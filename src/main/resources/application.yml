@@ -8,3 +8,6 @@ server:
 common:
   file:
     max-upload-size: ${spring.servlet.multipart.max-file-size}
+spring:
+  cache:
+    cache-names: common_files

@@ -2,8 +2,7 @@ package com.dr.framework.common.file.service.impl;
 
 import com.dr.framework.common.file.FileInfoHandler;
 import com.dr.framework.common.file.FileResource;
-import com.google.common.hash.Hashing;
-import com.google.common.io.ByteSource;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.tika.Tika;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,23 +30,10 @@ public class DefaultFileInfoHandler implements FileInfoHandler {
         }
     }
 
-    class FileResourceByteSource extends ByteSource {
-        FileResource resource;
-
-        FileResourceByteSource(FileResource resource) {
-            this.resource = resource;
-        }
-
-        @Override
-        public InputStream openStream() throws IOException {
-            return resource.getInputStream();
-        }
-    }
-
     @Override
-    public String fileHash(FileResource resource) {
+    public String fileHash(InputStream stream) {
         try {
-            return new FileResourceByteSource(resource).hash(Hashing.sha512()).toString();
+            return DigestUtils.sha512Hex(stream);
         } catch (IOException e) {
             e.printStackTrace();
             return UUID.randomUUID().toString();

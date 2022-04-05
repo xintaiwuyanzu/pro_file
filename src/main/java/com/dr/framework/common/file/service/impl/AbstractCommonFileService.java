@@ -11,7 +11,10 @@ import com.dr.framework.core.orm.sql.support.SqlQuery;
 import com.dr.framework.core.security.SecurityHolder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.Cache;
+import org.springframework.cache.CacheManager;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
@@ -24,7 +27,7 @@ import java.util.*;
  * <p>
  * 子类只处理逻辑
  */
-abstract class AbstractCommonFileService implements CommonFileService {
+abstract class AbstractCommonFileService implements CommonFileService, InitializingBean {
     protected static Logger logger = LoggerFactory.getLogger(CommonFileService.class);
     @Autowired
     protected CommonMapper commonMapper;
@@ -32,6 +35,9 @@ abstract class AbstractCommonFileService implements CommonFileService {
     protected FileInfoHandler fileInfoHandler;
     @Autowired
     protected FileSaveHandler fileSaveHandler;
+    @Autowired
+    CacheManager cacheManager;
+    protected Cache cache;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -209,8 +215,13 @@ abstract class AbstractCommonFileService implements CommonFileService {
 
     @Transactional(rollbackFor = Exception.class)
     public FileRelation last(String refId, String refType, String groupCode) {
-        return commonMapper.selectOneByQuery(buildLastQuery(buildParamsQuery(buildRelationQuery(), refId, refType, groupCode)));
+        FileRelation relation = commonMapper.selectOneByQuery(buildLastQuery(buildParamsQuery(buildRelationQuery(), refId, refType, groupCode)));
+        if (relation == null) {
+            String cacheKey = buildCacheKey(refId, refType, groupCode);
+        }
+        return relation;
     }
+
 
     @Transactional(rollbackFor = Exception.class)
     protected FileRelation next(String fileId) {
@@ -372,4 +383,20 @@ abstract class AbstractCommonFileService implements CommonFileService {
         }
         return null;
     }
+
+    @Override
+    public void afterPropertiesSet() {
+        cache = cacheManager.getCache("common_files");
+    }
+    /**
+     * 根据各种外键构造缓存外键
+     * @param refId
+     * @param refType
+     * @param groupCode
+     * @return
+     */
+    protected String buildCacheKey(String refId, String refType, String groupCode) {
+        return String.join("-", refId, refType, groupCode).toLowerCase();
+    }
+
 }
