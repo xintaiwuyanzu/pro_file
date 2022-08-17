@@ -391,6 +391,33 @@ public class DefaultCommonFileService extends AbstractCommonFileService {
     }
 
     @Override
+    @Transactional
+    public long changeGroup(String refId, String refType, String groupCode, String targetType, String targetGroupCode) {
+        Assert.isTrue(StringUtils.hasText(refId), "业务外键不能为空！");
+        if (!StringUtils.hasText(refType)) {
+            refType = DEFAULT_REF_TYPE;
+        }
+        if (!StringUtils.hasText(groupCode)) {
+            groupCode = DEFAULT_GROUP_CODE;
+        }
+        if (!StringUtils.hasText(targetType)) {
+            targetType = DEFAULT_REF_TYPE;
+        }
+        if (!StringUtils.hasText(targetGroupCode)) {
+            targetGroupCode = DEFAULT_GROUP_CODE;
+        }
+        if (refType.equals(targetType) && groupCode.equals(targetGroupCode)) {
+            return 0;
+        }
+        return commonMapper.updateIgnoreNullByQuery(SqlQuery.from(FileRelation.class)
+                .set(FileRelationInfo.GROUPCODE, targetGroupCode)
+                .set(FileRelationInfo.REFTYPE, targetType)
+                .equal(FileRelationInfo.REFID, refId)
+                .equal(FileRelationInfo.REFTYPE, refType)
+                .equal(FileRelationInfo.GROUPCODE, groupCode));
+    }
+
+    @Override
     public InputStream fileStream(String fileId) throws IOException {
         FileInfo fileInfo = fileInfo(fileId);
         Assert.isTrue(fileInfo != null, "指定的文件不存在！");

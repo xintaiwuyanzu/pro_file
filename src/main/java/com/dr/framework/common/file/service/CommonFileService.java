@@ -322,6 +322,18 @@ public interface CommonFileService {
     List<FileInfo> list(String refId, String refType, String groupCode);
 
     /**
+     * 批量修改指定类型文件的所属分组
+     *
+     * @param refId
+     * @param refType
+     * @param groupCode
+     * @param targetType
+     * @param targetGroupCode
+     * @return
+     */
+    long changeGroup(String refId, String refType, String groupCode, String targetType, String targetGroupCode);
+
+    /**
      * 获取文件输出流
      *
      * @param fileId
