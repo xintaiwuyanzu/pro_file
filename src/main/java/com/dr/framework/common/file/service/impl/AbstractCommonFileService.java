@@ -312,7 +312,8 @@ abstract class AbstractCommonFileService implements CommonFileService, Initializ
                         FileRelationInfo.REFID,
                         FileRelationInfo.REFTYPE,
                         FileRelationInfo.GROUPCODE,
-                        FileRelationInfo.DESCRIPTION
+                        FileRelationInfo.DESCRIPTION,
+                        FileRelationInfo.ORDERBY
                 )
                 .join(FileRelationInfo.FILEID, FileBaseInfoInfo.ID)
                 .setReturnClass(DefaultFileInfo.class);

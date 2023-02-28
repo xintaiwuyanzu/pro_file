@@ -144,6 +144,7 @@ public class DefaultCommonFileService extends AbstractCommonFileService {
                     fileBaseInfo.setFileType(file.getFileType());
                     fileBaseInfo.setFileAttr(file.getFileAttr());
                     fileBaseInfo.setMimeType(fileInfoHandler.fileMine(file));
+//                    fileBaseInfo.setOrder(file.getOrder());
                     fileHashMap.put(hash, fileBaseInfo);
                 } else {
                     return fileBaseInfo;
@@ -175,7 +176,7 @@ public class DefaultCommonFileService extends AbstractCommonFileService {
                              String refId, String refType, String groupCode,
                              String preId, String nextId) throws IOException {
         FileBaseInfo fileBaseInfo = saveBaseFile(file);
-        return saveFile(fileBaseInfo, file.getDescription(), refId, refType, groupCode, preId, nextId);
+        return saveFile(fileBaseInfo, file.getDescription(), refId, refType, groupCode, preId, nextId, file.getOrder());
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -183,6 +184,14 @@ public class DefaultCommonFileService extends AbstractCommonFileService {
                              String desc,
                              String refId, String refType, String groupCode,
                              String preId, String nextId) {
+        return saveFile(fileBaseInfo, desc, refId, refType, groupCode, preId, nextId, null);
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public FileInfo saveFile(FileBaseInfo fileBaseInfo,
+                             String desc,
+                             String refId, String refType, String groupCode,
+                             String preId, String nextId, Integer order) {
         //创建关联表信息
         FileRelation fileRelation = new FileRelation();
         //绑定创建人信息
@@ -201,6 +210,8 @@ public class DefaultCommonFileService extends AbstractCommonFileService {
         //更新前后id的链表
         updateRelation(preId, fileRelation.getId(), false);
         updateRelation(nextId, fileRelation.getId(), false);
+        //排序
+        fileRelation.setOrder(order);
         //添加关联表数据
         commonMapper.insert(fileRelation);
         return new DefaultFileInfo(fileBaseInfo, fileRelation);

@@ -18,6 +18,7 @@ public class FileSystemFileResource implements FileResource {
     private final String description;
     private String fileType;
     private String fileAttr;
+    private Integer order;
 
     public FileSystemFileResource(String filePath) {
         this(new File(filePath), null);
@@ -32,9 +33,14 @@ public class FileSystemFileResource implements FileResource {
     }
 
     public FileSystemFileResource(File file, String description) {
+        this(file, description, null);
+    }
+
+    public FileSystemFileResource(File file, String description, Integer order) {
         this.file = file;
         Assert.isTrue(file != null && file.exists() && file.isFile(), "指定的文件不存在：" + file.getPath());
         this.description = description;
+        this.order = order;
     }
 
     @Override
@@ -84,5 +90,14 @@ public class FileSystemFileResource implements FileResource {
 
     public void setFileAttr(String fileAttr) {
         this.fileAttr = fileAttr;
+    }
+
+    @Override
+    public Integer getOrder() {
+        return order;
+    }
+
+    public void setOrder(Integer order) {
+        this.order = order;
     }
 }

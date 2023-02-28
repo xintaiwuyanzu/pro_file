@@ -96,4 +96,13 @@ public interface FileResource {
     default String getFileAttr() {
         return "";
     }
+
+    /**
+     * 获取顺序
+     *
+     * @return
+     */
+    default Integer getOrder() {
+        return 0;
+    }
 }

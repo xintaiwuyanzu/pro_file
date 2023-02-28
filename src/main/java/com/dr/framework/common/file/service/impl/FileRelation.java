@@ -62,6 +62,22 @@ class FileRelation extends BaseCreateInfoEntity {
     @Column(comment = "后一个附件Id", length = 100)
     private String nextId;
 
+    @Column(comment = "order_info")
+    private Integer orderBy;
+    @Column(comment = "扩展字段1", length = 1000)
+    private String ext1;
+
+    @Column(comment = "扩展字段2", length = 1000)
+    private String ext2;
+
+    @Column(comment = "扩展字段3", length = 1000)
+    private String ext3;
+
+    @Column(comment = "扩展字段4", length = 1000)
+    private String ext4;
+
+    @Column(comment = "扩展字段5", length = 1000)
+    private String ext5;
 
     public FileRelation() {
     }
@@ -127,5 +143,53 @@ class FileRelation extends BaseCreateInfoEntity {
 
     public void setPreId(String preId) {
         this.preId = preId;
+    }
+
+    public Integer getOrder() {
+        return orderBy;
+    }
+
+    public void setOrder(Integer orderBy) {
+        this.orderBy = orderBy;
+    }
+
+    public String getExt1() {
+        return ext1;
+    }
+
+    public void setExt1(String ext1) {
+        this.ext1 = ext1;
+    }
+
+    public String getExt2() {
+        return ext2;
+    }
+
+    public void setExt2(String ext2) {
+        this.ext2 = ext2;
+    }
+
+    public String getExt3() {
+        return ext3;
+    }
+
+    public void setExt3(String ext3) {
+        this.ext3 = ext3;
+    }
+
+    public String getExt4() {
+        return ext4;
+    }
+
+    public void setExt4(String ext4) {
+        this.ext4 = ext4;
+    }
+
+    public String getExt5() {
+        return ext5;
+    }
+
+    public void setExt5(String ext5) {
+        this.ext5 = ext5;
     }
 }

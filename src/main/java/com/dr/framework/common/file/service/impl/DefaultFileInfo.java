@@ -17,6 +17,7 @@ class DefaultFileInfo extends DefaultBaseFile implements FileInfo {
     private String description;
     private String fileHash;
     private String mimeType;
+    private Integer orderBy;
 
     public DefaultFileInfo(FileBaseInfo base, FileRelation relation) {
         super(base);
@@ -25,7 +26,7 @@ class DefaultFileInfo extends DefaultBaseFile implements FileInfo {
         setRefType(relation.getRefType());
         setGroupCode(relation.getGroupCode());
         setDescription(relation.getDescription());
-
+        setOrder(relation.getOrder());
         setFileHash(base.getFileHash());
         setMimeType(base.getMimeType());
     }
@@ -111,6 +112,14 @@ class DefaultFileInfo extends DefaultBaseFile implements FileInfo {
 
     public void setMimeType(String mimeType) {
         this.mimeType = mimeType;
+    }
+
+    public Integer getOrder() {
+        return orderBy;
+    }
+
+    public void setOrder(Integer orderBy) {
+        this.orderBy = orderBy;
     }
 }
 
