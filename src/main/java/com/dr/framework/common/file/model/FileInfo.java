@@ -56,4 +56,11 @@ public interface FileInfo extends BaseFile {
      * @return
      */
     String getMimeType();
+
+    /**
+     * 顺序号
+     *
+     * @return
+     */
+    Integer getOrder();
 }

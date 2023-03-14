@@ -38,7 +38,7 @@ public class TestService {
                         {
                             SecurityHolder.set(securityHolder);
                             try {
-                                commonFileService.addFile(new FileSystemFileResource(file, c), refId);
+                                commonFileService.addFile(new FileSystemFileResource(file, c,1), refId);
                             } catch (IOException e) {
                                 e.printStackTrace();
                             }
