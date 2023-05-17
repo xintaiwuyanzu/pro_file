@@ -25,8 +25,8 @@ public interface FileInfoHandler {
      * @return
      */
     default String fileHash(FileResource resource) {
-        try {
-            return fileHash(resource.getInputStream());
+        try (InputStream stream = resource.getInputStream()) {
+            return fileHash(stream);
         } catch (IOException e) {
             e.printStackTrace();
             return UUID.randomUUID().toString();
